@@ -51,7 +51,6 @@ jobs:
           # CI-friendly formatting and ensure result is returned
           $config.Output.CIFormat = 'GithubActions'
           $config.Run.PassThru = $true
-          Write-Host "Pester config type: $($config.GetType().FullName)" -ForegroundColor Cyan
           $result = Invoke-Pester -Configuration $config
           if ($result.Result -ne 'Passed') {
             Write-Error "Pester run failed or coverage below target. Result: $($result.Result)"

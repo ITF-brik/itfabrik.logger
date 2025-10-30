@@ -1,6 +1,7 @@
 # ITFabrik.Logger
 
-[![CI](https://img.shields.io/github/actions/workflow/status/OWNER/REPO/pester-coverage.yml?branch=main&label=tests%20%26%20coverage)](https://github.com/OWNER/REPO/actions/workflows/pester-coverage.yml)
+[![CI - Tests](https://img.shields.io/github/actions/workflow/status/ITF-brik/itfabrik.logger/ci.yml?branch=main&label=CI%20-%20Tests)](https://github.com/ITF-brik/itfabrik.logger/actions/workflows/ci.yml)
+[![CI - Coverage](https://img.shields.io/github/actions/workflow/status/ITF-brik/itfabrik.logger/pester-coverage.yml?branch=main&label=CI%20-%20Coverage)](https://github.com/ITF-brik/itfabrik.logger/actions/workflows/pester-coverage.yml)
 [![PS Gallery Version](https://img.shields.io/powershellgallery/v/ITFabrik.Logger.svg?style=flat)](https://www.powershellgallery.com/packages/ITFabrik.Logger)
 [![PS Gallery Downloads](https://img.shields.io/powershellgallery/dt/ITFabrik.Logger.svg?style=flat)](https://www.powershellgallery.com/packages/ITFabrik.Logger)
 [![Release](https://img.shields.io/github/v/release/OWNER/REPO?display_name=tag&sort=semver)](https://github.com/OWNER/REPO/releases)

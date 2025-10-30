@@ -1,0 +1,41 @@
+# IDEs / Editors
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Logs / Temp
+*.log
+*.tmp
+tmp/
+
+# Packaging / Artifacts
+*.nupkg
+*.zip
+*.tar
+*.gz
+*.tgz
+dist/
+out/
+bin/
+obj/
+
+# Test outputs / Coverage
+TestResults/
+coverage.xml
+coverage/
+
+# PowerShell specific
+*.ps1xml
+*.pssc
+*.pssd1
+
+# Node / tooling (if any)
+node_modules/
+

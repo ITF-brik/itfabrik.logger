@@ -1,0 +1,42 @@
+name: Publish to PowerShellGallery
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PowerShellGet
+        shell: pwsh
+        run: |
+          Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
+          Install-Module PowerShellGet -Scope CurrentUser -Force -SkipPublisherCheck
+
+      - name: Validate tag matches ModuleVersion
+        shell: pwsh
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          if (-not $env:RELEASE_TAG) { throw 'Tag de release introuvable dans le contexte GitHub.' }
+          $manifest = Import-PowerShellDataFile -LiteralPath 'ITFabrik.Logger.psd1'
+          $moduleVersion = [string]$manifest.ModuleVersion
+          if ([string]::IsNullOrWhiteSpace($moduleVersion)) { throw 'ModuleVersion manquante dans ITFabrik.Logger.psd1' }
+          $tagVersion = $env:RELEASE_TAG.TrimStart('v','V')
+          if ($moduleVersion -ne $tagVersion) {
+            throw "Incohérence: ModuleVersion=$moduleVersion <> Tag=$($env:RELEASE_TAG)"
+          }
+          Write-Host "Tag/Version alignés: v$moduleVersion" -ForegroundColor Green
+
+      - name: Publish Module
+        shell: pwsh
+        env:
+          PSGALLERY_API_KEY: ${{ secrets.PSGALLERY_API_KEY }}
+        run: |
+          if (-not $env:PSGALLERY_API_KEY) { throw 'Secret PSGALLERY_API_KEY manquant' }
+          ./Scripts/Publish-PSGallery.ps1 -ApiKey $env:PSGALLERY_API_KEY

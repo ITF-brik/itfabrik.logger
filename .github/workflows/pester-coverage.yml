@@ -1,0 +1,30 @@
+name: Test and Coverage
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Pester 5
+        shell: pwsh
+        run: |
+          Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
+          Install-Module Pester -MinimumVersion 5.5.0 -Scope CurrentUser -Force -SkipPublisherCheck
+
+      - name: Run tests with coverage gate (>=90%)
+        shell: pwsh
+        run: |
+          $config = Import-PowerShellDataFile 'Tests/PesterConfig.psd1'
+          $result = Invoke-Pester -Configuration $config -CI -PassThru
+          if ($result.Result -ne 'Passed') {
+            Write-Error "Pester run failed or coverage below target. Result: $($result.Result)"
+          }
+

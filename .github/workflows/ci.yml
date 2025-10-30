@@ -23,10 +23,22 @@ jobs:
         run: |
           Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
 
+      - name: Cache PowerShell modules
+        uses: actions/cache@v4
+        with:
+          path: "~\\Documents\\PowerShell\\Modules"
+          key: pwsh-modules-${{ runner.os }}-pester-5.5.0
+          restore-keys: |
+            pwsh-modules-${{ runner.os }}-pester-
+
       - name: Install Pester 5.5+
         shell: pwsh
         run: |
-          Install-Module Pester -MinimumVersion 5.5.0 -Scope CurrentUser -Force -SkipPublisherCheck
+          if (-not (Get-Module -ListAvailable Pester -MinimumVersion 5.5.0)) {
+            Install-Module Pester -MinimumVersion 5.5.0 -Scope CurrentUser -Force -SkipPublisherCheck
+          } else {
+            Write-Host "Pester >= 5.5.0 already available via cache" -ForegroundColor Green
+          }
 
       - name: Run Pester tests
         shell: pwsh

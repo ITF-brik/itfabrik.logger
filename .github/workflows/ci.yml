@@ -34,10 +34,12 @@ jobs:
       - name: Install Pester 5.5+
         shell: pwsh
         run: |
-          if (-not (Get-Module -ListAvailable Pester -MinimumVersion 5.5.0)) {
+          $min = [version]'5.5.0'
+          $installed = Get-Module -ListAvailable Pester | Sort-Object Version -Descending | Select-Object -First 1
+          if (-not $installed -or $installed.Version -lt $min) {
             Install-Module Pester -MinimumVersion 5.5.0 -Scope CurrentUser -Force -SkipPublisherCheck
           } else {
-            Write-Host "Pester >= 5.5.0 already available via cache" -ForegroundColor Green
+            Write-Host "Pester $($installed.Version) already available (>= $min)" -ForegroundColor Green
           }
 
       - name: Run Pester tests

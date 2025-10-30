@@ -36,8 +36,10 @@ jobs:
             $ht = Import-PowerShellDataFile -LiteralPath $configPath
             Import-Module Pester -MinimumVersion 5.5.0 -Force | Out-Null
             $config = New-PesterConfiguration -Hashtable $ht
+            # CI-friendly formatting under GitHub Actions
+            $config.Output.CIFormat = 'GithubActions'
             Write-Host "Pester config type: $($config.GetType().FullName)" -ForegroundColor Cyan
-            Invoke-Pester -Configuration $config -CI
+            Invoke-Pester -Configuration $config
           } else {
             Invoke-Pester -Path 'Tests' -CI
           }

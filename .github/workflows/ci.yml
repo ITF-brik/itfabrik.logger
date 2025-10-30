@@ -33,7 +33,13 @@ jobs:
         run: |
           $configPath = 'Tests/PesterConfig.psd1'
           if (Test-Path -LiteralPath $configPath) {
-            $config = Import-PowerShellDataFile $configPath
+            $ht = Import-PowerShellDataFile $configPath
+            try {
+              $config = [PesterConfiguration]::FromHashtable($ht)
+            } catch {
+              $config = $ht
+            }
+            Write-Host "Pester config type: $($config.GetType().FullName)" -ForegroundColor Cyan
             Invoke-Pester -Configuration $config -CI
           } else {
             Invoke-Pester -Path 'Tests' -CI

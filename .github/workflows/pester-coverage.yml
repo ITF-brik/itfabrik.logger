@@ -31,7 +31,13 @@ jobs:
       - name: Run Pester tests with coverage gate (>=90%)
         shell: pwsh
         run: |
-          $config = Import-PowerShellDataFile 'Tests/PesterConfig.psd1'
+          $ht = Import-PowerShellDataFile 'Tests/PesterConfig.psd1'
+          try {
+            $config = [PesterConfiguration]::FromHashtable($ht)
+          } catch {
+            $config = $ht
+          }
+          Write-Host "Pester config type: $($config.GetType().FullName)" -ForegroundColor Cyan
           $result = Invoke-Pester -Configuration $config -CI -PassThru
           if ($result.Result -ne 'Passed') {
             Write-Error "Pester run failed or coverage below target. Result: $($result.Result)"

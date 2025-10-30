@@ -12,11 +12,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup PowerShellGet
+      - name: Setup PSGallery
         shell: pwsh
         run: |
           Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
-          Install-Module PowerShellGet -Scope CurrentUser -Force -SkipPublisherCheck
 
       - name: Validate tag matches ModuleVersion
         shell: pwsh

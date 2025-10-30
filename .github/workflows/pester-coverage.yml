@@ -31,12 +31,9 @@ jobs:
       - name: Run Pester tests with coverage gate (>=90%)
         shell: pwsh
         run: |
-          $ht = Import-PowerShellDataFile 'Tests/PesterConfig.psd1'
-          try {
-            $config = [PesterConfiguration]::FromHashtable($ht)
-          } catch {
-            $config = $ht
-          }
+          $ht = Import-PowerShellDataFile -LiteralPath 'Tests/PesterConfig.psd1'
+          Import-Module Pester -MinimumVersion 5.5.0 -Force | Out-Null
+          $config = New-PesterConfiguration -Hashtable $ht
           Write-Host "Pester config type: $($config.GetType().FullName)" -ForegroundColor Cyan
           $result = Invoke-Pester -Configuration $config -CI -PassThru
           if ($result.Result -ne 'Passed') {

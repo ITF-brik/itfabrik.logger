@@ -13,7 +13,6 @@ Logger est un module PowerShell de journalisation compatible StepManager via la 
 
 ## Installation
 
-Note: Pour exécuter les tests en local, voir la section "Executer les tests en local" ci‑dessous.
 
 - Depuis PowerShell Gallery (recommandé):
 

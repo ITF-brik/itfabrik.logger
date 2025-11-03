@@ -7,9 +7,9 @@ function Format-LoggerLineDefault {
         [int]$IndentLevel = 0
     )
 
-    # Uniform severity field width inside brackets, right-aligned
-    $fieldWidth = 10
-    $sevPadded = $Severity.PadLeft($fieldWidth)
-    $indent = if ($IndentLevel -gt 0) { ' ' * ($IndentLevel * 2) } else { '' }
+    # Use shared prefix helper to keep width/indent consistent with console
+    $parts = Get-LoggerPrefix -Severity $Severity -IndentLevel $IndentLevel
+    $sevPadded = $Severity.PadLeft($parts.FieldWidth)
+    $indent = $parts.Indent
     return "[$Timestamp] [$sevPadded]$indent[$Component] $Message"
 }

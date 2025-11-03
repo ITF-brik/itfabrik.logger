@@ -17,6 +17,6 @@ function Get-LoggerPrefix {
         SeverityPad = $severityPad
         Indent      = $indent
         StepTag     = $stepTag
+        FieldWidth  = $fieldWidth
     }
 }
-

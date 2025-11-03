@@ -4,7 +4,7 @@
 [![CI - Coverage](https://img.shields.io/github/actions/workflow/status/ITF-brik/itfabrik.logger/pester-coverage.yml?branch=main&label=CI%20-%20Coverage)](https://github.com/ITF-brik/itfabrik.logger/actions/workflows/pester-coverage.yml)
 [![PS Gallery Version](https://img.shields.io/powershellgallery/v/ITFabrik.Logger.svg?style=flat)](https://www.powershellgallery.com/packages/ITFabrik.Logger)
 [![PS Gallery Downloads](https://img.shields.io/powershellgallery/dt/ITFabrik.Logger.svg?style=flat)](https://www.powershellgallery.com/packages/ITFabrik.Logger)
-[![Release](https://img.shields.io/github/v/release/OWNER/REPO?display_name=tag&sort=semver)](https://github.com/OWNER/REPO/releases)
+[![Release](https://img.shields.io/github/v/release/ITF-brik/itfabrik.logger?display_name=tag&sort=semver)](https://github.com/ITF-brik/itfabrik.logger/releases)
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 
 Logger est un module PowerShell de journalisation compatible StepManager via la variable globale `$StepManagerLogger`. Il fournit des sinks Console et Fichier avec formats configurables, rotation et encodage, et s’intègre automatiquement à StepManager pour un affichage cohérent (icônes, couleurs, indentation).
@@ -38,9 +38,9 @@ Import-Module .\ITFabrik.Logger.psd1 -Force
 
 ```powershell
 # Remplacez OWNER/REPO par le dépôt GitHub de ce module
-$tag = (Invoke-RestMethod https://api.github.com/repos/OWNER/REPO/releases/latest).tag_name
+$tag = (Invoke-RestMethod https://api.github.com/repos/ITF-brik/itfabrik.logger/releases/latest).tag_name
 $zip = Join-Path $env:TEMP "ITFabrik.Logger-$tag.zip"
-Invoke-WebRequest -Uri "https://github.com/OWNER/REPO/releases/download/$tag/ITFabrik.Logger-$tag.zip" -OutFile $zip
+Invoke-WebRequest -Uri "https://github.com/ITF-brik/itfabrik.logger/releases/download/$tag/ITFabrik.Logger-$tag.zip" -OutFile $zip
 $dst = Join-Path $HOME "Documents/PowerShell/Modules/ITFabrik.Logger"
 if (-not (Test-Path $dst)) { New-Item -ItemType Directory -Path $dst -Force | Out-Null }
 Expand-Archive -Path $zip -DestinationPath $dst -Force

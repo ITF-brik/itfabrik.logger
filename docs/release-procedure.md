@@ -10,8 +10,13 @@ Ce guide decrit, pas a pas, comment publier une nouvelle version du module ITFab
 
 ## 2) Valider localement
 - Lancer les tests:
-  - Avec config: `Invoke-Pester -Configuration Tests/PesterConfig.psd1 -CI`
-  - Ou simple: `Invoke-Pester -Path Tests -CI`
+  - Avec config (Pester v5):
+    ```powershell
+    Import-Module Pester -MinimumVersion 5.5.0 -Force
+    $cfg = New-PesterConfiguration -Hashtable (Import-PowerShellDataFile 'Tests/PesterConfig.psd1')
+    Invoke-Pester -Configuration $cfg
+    ```
+  - Ou simple: `Invoke-Pester -Path Tests`
 - Corriger si besoin jusqu'a ce que tout passe.
 
 ## 3) Mettre a jour la version
@@ -33,7 +38,9 @@ Ce guide decrit, pas a pas, comment publier une nouvelle version du module ITFab
 - Un workflow GitHub (`.github/workflows/check-tag.yml`) verifie automatiquement que le tag matche la `ModuleVersion`.
 
 ## 5) Creer la release GitHub
-- Aller sur GitHub > Releases > Draft a new release.
+- Aller sur GitHub > Releases > Draft a new release
+  - Lien direct: https://github.com/ITF-brik/itfabrik.logger/releases/new
+  - Liste des releases: https://github.com/ITF-brik/itfabrik.logger/releases
 - Tag: selectionner le tag cree `vX.Y.Z`.
 - Target branch: `main`.
 - Titre/notes: copier le resume du `CHANGELOG.md`.
@@ -75,4 +82,3 @@ Ce guide decrit, pas a pas, comment publier une nouvelle version du module ITFab
 - Workflow verif tag: `.github/workflows/check-tag.yml`
 - Workflow publication: `.github/workflows/publish.yml`
 - Tests: `Tests/`, `Tests/PesterConfig.psd1`
-

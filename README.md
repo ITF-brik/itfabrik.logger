@@ -37,7 +37,7 @@ Import-Module .\ITFabrik.Logger.psd1 -Force
 - Installation manuelle depuis GitHub Release:
 
 ```powershell
-# Remplacez OWNER/REPO par le dépôt GitHub de ce module
+# Dépôt GitHub de ce module
 $tag = (Invoke-RestMethod https://api.github.com/repos/ITF-brik/itfabrik.logger/releases/latest).tag_name
 $zip = Join-Path $env:TEMP "ITFabrik.Logger-$tag.zip"
 Invoke-WebRequest -Uri "https://github.com/ITF-brik/itfabrik.logger/releases/download/$tag/ITFabrik.Logger-$tag.zip" -OutFile $zip

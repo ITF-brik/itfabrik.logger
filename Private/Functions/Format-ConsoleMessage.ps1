@@ -8,23 +8,22 @@ function Format-ConsoleMessage {
         [string]$ForegroundColor
     )
 
-    # Standardise le préfixe pour rester stable en test
-    $prefixRaw = "[$Severity]"
+    # Préfixe partagé (padding sévérité, indentation, step)
+    $parts = Get-LoggerPrefix -Severity $Severity -IndentLevel $IndentLevel -StepName $StepName
 
     switch ($Severity) {
-        'Info'    { $prefix = $prefixRaw + (' ' * 4) ; if(-not $ForegroundColor){ $ForegroundColor = 'Gray' } }
-        'Success' { $prefix = $prefixRaw + (' ' * 3) ; if(-not $ForegroundColor){ $ForegroundColor = 'Green' } }
-        'Warning' { $prefix = $prefixRaw + (' ' * 4) ; if(-not $ForegroundColor){ $ForegroundColor = 'Yellow' } }
-        'Error'   { $prefix = $prefixRaw + (' ' * 3) ; if(-not $ForegroundColor){ $ForegroundColor = 'Red' } }
-        'Debug'   { $prefix = $prefixRaw + (' ' * 3) ; if(-not $ForegroundColor){ $ForegroundColor = 'Cyan' } }
-        'Verbose' { $prefix = $prefixRaw + (' ' * 3) ; if(-not $ForegroundColor){ $ForegroundColor = 'Magenta' } }
-        default   { $prefix = $prefixRaw + (' ' * 3) ; if(-not $ForegroundColor){ $ForegroundColor = 'White' } }
+        'Info'    { if(-not $ForegroundColor){ $ForegroundColor = 'Gray' } }
+        'Success' { if(-not $ForegroundColor){ $ForegroundColor = 'Green' } }
+        'Warning' { if(-not $ForegroundColor){ $ForegroundColor = 'Yellow' } }
+        'Error'   { if(-not $ForegroundColor){ $ForegroundColor = 'Red' } }
+        'Debug'   { if(-not $ForegroundColor){ $ForegroundColor = 'Cyan' } }
+        'Verbose' { if(-not $ForegroundColor){ $ForegroundColor = 'Magenta' } }
+        default   { if(-not $ForegroundColor){ $ForegroundColor = 'White' } }
     }
 
-    $indent = if ($IndentLevel -gt 0) { ' ' * ($IndentLevel * 2) } else { '' }
     $now = (Get-Date -Format 'yyyy-MM-dd HH:mm:ss')
-    $step = if ($StepName) { "[$StepName]" } else { '' }
-    $text = "[$now] $prefix$indent$step $Message"
+    $prefix = "[$Severity]" + $parts.SeverityPad
+    $text = "[$now] $prefix$($parts.Indent)$($parts.StepTag) $Message"
 
     [pscustomobject]@{
         Text = $text

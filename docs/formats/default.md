@@ -8,3 +8,5 @@ Détails
 - Severité à largeur fixe (10), alignée à droite dans les crochets.
 - Indentation: 2 espaces/niveau, placée après `[Component]`.
 
+Note
+- L’alignement (largeur et indentation) est désormais factorisé via un helper partagé (`Get-LoggerPrefix`) afin de conserver un rendu strictement cohérent entre Console et Fichier (Default).

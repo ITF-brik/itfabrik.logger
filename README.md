@@ -51,6 +51,22 @@ Import-Module ITFabrik.Logger -Force
 
 ---
 
+## Executer les tests en local
+
+- Avec configuration (Pester v5):
+
+```powershell
+Import-Module Pester -MinimumVersion 5.5.0 -Force
+$cfg = New-PesterConfiguration -Hashtable (Import-PowerShellDataFile 'Tests/PesterConfig.psd1')
+Invoke-Pester -Configuration $cfg
+```
+
+- Ou simple (sans config):
+
+```powershell
+Invoke-Pester -Path Tests
+```
+
 ## Fonctionnalités
 
 - Intégration StepManager automatique via `$Global:StepManagerLogger`.

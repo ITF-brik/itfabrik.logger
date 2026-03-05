@@ -5,6 +5,10 @@ The format is based on Keep a Changelog, and this project adheres to SemVer.
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-03-05
+### Fixed
+- Format de ligne `Default` du sink fichier: indentation appliquée au message (après `[Component]`) pour garder une colonne composant stable.
+
 ## [0.2.1] - 2026-03-05
 ### Changed
 - Workflow de publication CI ajusté pour autoriser un déclenchement manuel avec un tag de release en entrée.
@@ -58,7 +62,8 @@ The format is based on Keep a Changelog, and this project adheres to SemVer.
 
 ---
 
-[Unreleased]: https://github.com/ITF-brik/itfabrik.logger/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/ITF-brik/itfabrik.logger/compare/v0.2.2...HEAD
+[0.2.2]: https://github.com/ITF-brik/itfabrik.logger/releases/tag/v0.2.2
 [0.2.1]: https://github.com/ITF-brik/itfabrik.logger/releases/tag/v0.2.1
 [0.2.0]: https://github.com/ITF-brik/itfabrik.logger/releases/tag/v0.2.0
 [0.1.0]: https://github.com/ITF-brik/itfabrik.logger/releases/tag/v0.1.0

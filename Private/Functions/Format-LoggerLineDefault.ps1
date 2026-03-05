@@ -7,9 +7,9 @@ function Format-LoggerLineDefault {
         [int]$IndentLevel = 0
     )
 
-    # Use shared prefix helper to keep width/indent consistent with console
+    # Keep component column stable; indent applies to message content only.
     $parts = Get-LoggerPrefix -Severity $Severity -IndentLevel $IndentLevel
     $sevPadded = $Severity.PadLeft($parts.FieldWidth)
     $indent = $parts.Indent
-    return "[$Timestamp] [$sevPadded]$indent[$Component] $Message"
+    return "[$Timestamp] [$sevPadded][$Component] $indent$Message"
 }

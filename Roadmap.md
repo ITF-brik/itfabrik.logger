@@ -1,29 +1,63 @@
 # Roadmap
 
-Objectifs réalisés
-- Logger console aligné sur Write-StepMessage (icônes, couleurs, indentation, StepName)
-- Logger fichier avec formats Default et Cmtrace (XML-like)
-- Encodage par défaut UTF8BOM (accents OK dans Cmtrace)
-- Indentation placée après [Component] pour le format Default
-- Champ Severity à largeur fixe dans le format Default
-- Rotations: NewFile, Size, Daily, et rotation omise (écrase puis append par session)
-- Documentation initiale dans `docs/` (sinks, formats, configuration, rotation, troubleshooting)
-- CI GitHub Actions (Windows): tests Pester v5 avec configuration, coverage gate, cache des modules, concurrency et triggers manuels
-- Publication automatisée PowerShell Gallery via release GitHub (tag `vX.Y.Z` aligné à `ModuleVersion`); badges CI/Coverage/Release dans le README
+## Objective
+Publier sur PowerShell Gallery un module **buildé** contenant uniquement:
+- `ITFabrik.Logger.psd1`
+- `ITFabrik.Logger.psm1`
+- `LICENSE`
+- `README.md`
 
-Court terme
-- Uniformiser le calcul du préfixe (icône + padding + indentation + StepName) via un helper partagé (console + fichier Default)
-- Exposer `StepName` (et éventuellement `ForegroundColor`) dans LoggerService jusqu'aux sinks de manière formelle
-- Étendre les tests Pester (multi‑niveaux d'indentation, padding de Severity, cas limites Cmtrace)
-- Ajouter un exemple de configuration (psd1/JSON) et un helper d'initialisation pour enregistrer les sinks au chargement
+## Phase 1 - Build System
+- Créer `Scripts/Build-Module.ps1`.
+- Générer `dist/ITFabrik.Logger/ITFabrik.Logger.psm1` self-contained (merge ordonné des classes/fonctions publiques/privées).
+- Copier `ITFabrik.Logger.psd1`, `LICENSE`, `README.md` dans `dist/ITFabrik.Logger`.
+- Adapter le manifeste dist (au minimum vérifier `RootModule`; option: `FileList` explicite).
+- Status: **Done**
 
-Moyen terme
-- Réintroduire le Web sink (HTTP) côté API publique: `Url`, `ApiKey`, `Headers`; POST JSON, gestion d'erreurs/retries, timeouts configurables
-- File sink asynchrone (buffer/queue) pour limiter l'impact I/O en scripts intensifs
-- Changelog automatique (génération à partir des commits/tags) et notes de version
+Deliverables:
+- `Scripts/Build-Module.ps1`
+- `dist/ITFabrik.Logger/*` généré localement
 
-Long terme / idées
-- Support de tree/branches piloté (IsLast) pour les messages hiérarchiques
-- Sortie structurée optionnelle (JSON Lines) pour ingestion SIEM
-- Intégrations possibles: adaptateur style Serilog, syslog/ETW
+## Phase 2 - Publish Path Hardening
+- Modifier `Scripts/Publish-PSGallery.ps1` pour publier depuis `dist/ITFabrik.Logger`.
+- Ajouter un garde: erreur si `dist` absent ou incomplet.
+- Status: **Done**
 
+Deliverables:
+- `Scripts/Publish-PSGallery.ps1` mis à jour
+
+## Phase 3 - Workflow Integration
+- Mettre à jour `.github/workflows/publish.yml`:
+  - build artifact
+  - vérification contenu minimal
+  - publication depuis `dist`
+- Conserver validation tag/version déjà existante.
+- Status: **Done**
+
+Deliverables:
+- `.github/workflows/publish.yml` mis à jour
+
+## Phase 4 - Validation
+- Ajouter des checks build:
+  - `Test-ModuleManifest` sur `dist/ITFabrik.Logger/ITFabrik.Logger.psd1`
+  - `Import-Module` sur artifact dist
+  - ScriptAnalyzer sur artifact buildé (si pertinent)
+- Ajouter un check de contenu strict (exactement 4 fichiers attendus).
+- Status: **Done**
+
+Deliverables:
+- validation script intégrée au build/publish
+
+## Phase 5 - Release Readiness
+- Mettre à jour documentation release pour inclure la chaîne build -> validate -> publish.
+- Ajouter rollback guide si publication Gallery échoue.
+- Status: **Done**
+
+Deliverables:
+- docs release alignées
+
+## Acceptance Criteria
+- Le package publié contient uniquement les 4 fichiers demandés.
+- `Import-Module` fonctionne depuis l’artifact publié.
+- Workflow publish échoue si artifact incomplet/non buildé.
+- Tag et `ModuleVersion` restent alignés.

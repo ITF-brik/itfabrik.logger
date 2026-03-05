@@ -17,6 +17,26 @@ Ce guide decrit, pas a pas, comment publier une nouvelle version du module ITFab
     Invoke-Pester -Configuration $cfg
     ```
   - Ou simple: `Invoke-Pester -Path Tests`
+- Lancer l'analyse statique:
+  ```powershell
+  Import-Module PSScriptAnalyzer -MinimumVersion 1.22.0 -Force
+  $targets = @('ITFabrik.Logger.psm1','Public','Private')
+  $issues = foreach ($target in $targets) {
+    Invoke-ScriptAnalyzer -Path $target -Recurse -Settings 'PSScriptAnalyzerSettings.psd1'
+  }
+  if ($issues) {
+    $issues | Format-Table -AutoSize
+    throw "ScriptAnalyzer found $($issues.Count) issue(s)."
+  }
+  ```
+- Construire l'artifact publie:
+  ```powershell
+  ./Scripts/Build-Module.ps1
+  ```
+- Verifier l'artifact (sans publier):
+  ```powershell
+  ./Scripts/Publish-PSGallery.ps1 -ModulePath .\dist\ITFabrik.Logger -ValidateOnly
+  ```
 - Corriger si besoin jusqu'a ce que tout passe.
 
 ## 3) Mettre a jour la version
@@ -48,7 +68,12 @@ Ce guide decrit, pas a pas, comment publier une nouvelle version du module ITFab
 
 ## 6) Publication PowerShell Gallery
 - Le workflow `.github/workflows/publish.yml` se declenche sur `release: published`.
-- Il valide a nouveau que `ModuleVersion` == tag `vX.Y.Z`, puis publie via `Scripts/Publish-PSGallery.ps1` en utilisant `PSGALLERY_API_KEY`.
+- Il execute la chaine complete:
+  - Validation tag/version
+  - Build de l'artifact (`Scripts/Build-Module.ps1`)
+  - Verification stricte du contenu (`psd1`, `psm1`, `LICENSE`, `README.md`)
+  - ScriptAnalyzer sur l'artifact build
+  - Publication via `Scripts/Publish-PSGallery.ps1` (source: `dist/ITFabrik.Logger`)
 
 ## 7) Verifier la publication
 - Installer la version publiee depuis PSGallery (depuis une session propre):
@@ -74,6 +99,20 @@ Ce guide decrit, pas a pas, comment publier une nouvelle version du module ITFab
     ./Scripts/New-ReleaseTag.ps1 -Push
     ```
 - Echec de publication (secret manquant): ajouter `PSGALLERY_API_KEY` dans les Secrets et republier la release.
+- Echec validation artifact (missing/extra files):
+  - Regenerer l'artifact localement:
+    ```powershell
+    ./Scripts/Build-Module.ps1
+    ./Scripts/Publish-PSGallery.ps1 -ModulePath .\dist\ITFabrik.Logger -ValidateOnly
+    ```
+  - Corriger le build si le contenu n'est pas exactement: `ITFabrik.Logger.psd1`, `ITFabrik.Logger.psm1`, `LICENSE`, `README.md`.
+- Echec ScriptAnalyzer sur artifact build:
+  - Reproduire localement:
+    ```powershell
+    Import-Module PSScriptAnalyzer -MinimumVersion 1.22.0 -Force
+    Invoke-ScriptAnalyzer -Path .\dist\ITFabrik.Logger\ITFabrik.Logger.psm1 -Settings .\PSScriptAnalyzerSettings.psd1
+    ```
+  - Corriger le code source, rebuild, puis relancer la publication.
 - Version PSGallery a retirer: utiliser l'interface PSGallery (ou `Unpublish-Module` si applicable) et corriger la release.
 
 ## Fichiers et commandes utiles
@@ -81,4 +120,5 @@ Ce guide decrit, pas a pas, comment publier une nouvelle version du module ITFab
 - Script tag: `Scripts/New-ReleaseTag.ps1`
 - Workflow verif tag: `.github/workflows/check-tag.yml`
 - Workflow publication: `.github/workflows/publish.yml`
+- Build artifact: `Scripts/Build-Module.ps1`, `dist/ITFabrik.Logger/`
 - Tests: `Tests/`, `Tests/PesterConfig.psd1`

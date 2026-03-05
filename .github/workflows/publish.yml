@@ -2,6 +2,11 @@ name: Publish to PowerShellGallery
 
 on:
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release tag to validate (e.g. v0.2.0). Optional for manual runs.'
+        required: false
+        type: string
   release:
     types: [published]
 
@@ -21,16 +26,23 @@ jobs:
         shell: pwsh
         env:
           RELEASE_TAG: ${{ github.event.release.tag_name }}
+          INPUT_RELEASE_TAG: ${{ inputs.release_tag }}
         run: |
-          if (-not $env:RELEASE_TAG) { throw 'Tag de release introuvable dans le contexte GitHub.' }
           $manifest = Import-PowerShellDataFile -LiteralPath 'ITFabrik.Logger.psd1'
           $moduleVersion = [string]$manifest.ModuleVersion
           if ([string]::IsNullOrWhiteSpace($moduleVersion)) { throw 'ModuleVersion manquante dans ITFabrik.Logger.psd1' }
-          $tagVersion = $env:RELEASE_TAG.TrimStart('v','V')
-          if ($moduleVersion -ne $tagVersion) {
-            throw "Incohérence: ModuleVersion=$moduleVersion <> Tag=$($env:RELEASE_TAG)"
+          $releaseTag = if (-not [string]::IsNullOrWhiteSpace($env:RELEASE_TAG)) {
+            $env:RELEASE_TAG
+          } elseif (-not [string]::IsNullOrWhiteSpace($env:INPUT_RELEASE_TAG)) {
+            $env:INPUT_RELEASE_TAG
+          } else {
+            "v$moduleVersion"
           }
-          Write-Host "Tag/Version alignés: v$moduleVersion" -ForegroundColor Green
+          $tagVersion = $releaseTag.TrimStart('v','V')
+          if ($moduleVersion -ne $tagVersion) {
+            throw "Incohérence: ModuleVersion=$moduleVersion <> Tag=$releaseTag"
+          }
+          Write-Host "Tag/Version alignés: $releaseTag (ModuleVersion=$moduleVersion)" -ForegroundColor Green
 
       - name: Build module artifact
         shell: pwsh

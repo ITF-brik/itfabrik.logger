@@ -8,7 +8,7 @@ on:
         required: false
         type: string
   release:
-    types: [published]
+    types: [published, released]
 
 jobs:
   publish:
@@ -26,7 +26,8 @@ jobs:
         shell: pwsh
         env:
           RELEASE_TAG: ${{ github.event.release.tag_name }}
-          INPUT_RELEASE_TAG: ${{ inputs.release_tag }}
+          INPUT_RELEASE_TAG: ${{ github.event.inputs.release_tag }}
+          REF_TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
         run: |
           $manifest = Import-PowerShellDataFile -LiteralPath 'ITFabrik.Logger.psd1'
           $moduleVersion = [string]$manifest.ModuleVersion
@@ -35,6 +36,8 @@ jobs:
             $env:RELEASE_TAG
           } elseif (-not [string]::IsNullOrWhiteSpace($env:INPUT_RELEASE_TAG)) {
             $env:INPUT_RELEASE_TAG
+          } elseif (-not [string]::IsNullOrWhiteSpace($env:REF_TAG)) {
+            $env:REF_TAG
           } else {
             "v$moduleVersion"
           }

@@ -3,7 +3,9 @@
 All notable changes to this project will be documented in this file.
 The format is based on Keep a Changelog, and this project adheres to SemVer.
 
-## [Unreleased] (0.2.0)
+## [Unreleased]
+
+## [0.2.0] - 2026-03-05
 ### Added
 - Script de build `Scripts/Build-Module.ps1` pour générer un artifact minimal dans `dist/ITFabrik.Logger`.
 - Exposition publique du sink Web via `Register-LoggerSink -Type Web` (`Url`, `APIKey`, `Headers`, `OnError`).
@@ -48,5 +50,6 @@ The format is based on Keep a Changelog, and this project adheres to SemVer.
 
 ---
 
-[Unreleased]: https://github.com/ITF-brik/itfabrik.logger/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/ITF-brik/itfabrik.logger/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/ITF-brik/itfabrik.logger/releases/tag/v0.2.0
 [0.1.0]: https://github.com/ITF-brik/itfabrik.logger/releases/tag/v0.1.0

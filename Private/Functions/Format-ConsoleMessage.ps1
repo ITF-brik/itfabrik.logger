@@ -7,6 +7,7 @@ function Format-ConsoleMessage {
         [string]$StepName = '',
         [string]$ForegroundColor
     )
+    $null = $Component
 
     # Préfixe partagé (padding sévérité, indentation, step)
     $parts = Get-LoggerPrefix -Severity $Severity -IndentLevel $IndentLevel -StepName $StepName

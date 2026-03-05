@@ -2,8 +2,15 @@ $ErrorActionPreference = 'Stop'
 
 Describe 'ITFabrik.Logger Module' {
     BeforeAll {
-        $modulePath = Join-Path $PSScriptRoot '..\ITFabrik.Logger.psd1'
-        Import-Module $modulePath -Force
+        $script:modulePath = Join-Path $PSScriptRoot '..\ITFabrik.Logger.psd1'
+        Import-Module $script:modulePath -Force
+    }
+
+    It 'does not set StepManagerLogger on module import' {
+        Disable-Logger
+        Remove-Module ITFabrik.Logger -ErrorAction SilentlyContinue
+        Import-Module $script:modulePath -Force
+        { Get-Variable -Name StepManagerLogger -Scope Global -ErrorAction Stop } | Should -Throw
     }
 
     It 'exports helper functions' {

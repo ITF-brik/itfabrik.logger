@@ -31,7 +31,7 @@ class LoggerService {
     [object[]] GetSinks() { return ,$this.Sinks.ToArray() }
 
     [void] ConfigureService() {
-        $Global:StepManagerLogger = {
+        $dispatcher = {
             param(
                 [Parameter(Mandatory)] [string]$Component,
                 [Parameter(Mandatory)] [string]$Message,
@@ -47,5 +47,6 @@ class LoggerService {
                 }
             }
         }
+        Set-Variable -Name 'StepManagerLogger' -Scope Global -Value $dispatcher
     }
 }

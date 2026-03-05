@@ -1,4 +1,6 @@
 function Invoke-SMConsoleLogger {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'Component', Justification = 'Keep ITFabrik.Stepper-compatible signature (legacy StepManagerLogger contract).')]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingWriteHost', '', Justification = 'Console sink intentionally writes to host.')]
     param(
         [Parameter(Mandatory)] [string]$Component,
         [Parameter(Mandatory)] [string]$Message,

@@ -42,6 +42,41 @@ jobs:
             Write-Host "Pester $($installed.Version) already available (>= $min)" -ForegroundColor Green
           }
 
+      - name: Install PSScriptAnalyzer 1.22+
+        shell: pwsh
+        run: |
+          $min = [version]'1.22.0'
+          $installed = Get-Module -ListAvailable PSScriptAnalyzer | Sort-Object Version -Descending | Select-Object -First 1
+          if (-not $installed -or $installed.Version -lt $min) {
+            Install-Module PSScriptAnalyzer -MinimumVersion 1.22.0 -Scope CurrentUser -Force -SkipPublisherCheck
+          } else {
+            Write-Host "PSScriptAnalyzer $($installed.Version) already available (>= $min)" -ForegroundColor Green
+          }
+
+      - name: Run ScriptAnalyzer (Error/Warning gate)
+        shell: pwsh
+        run: |
+          $settingsPath = 'PSScriptAnalyzerSettings.psd1'
+          if (-not (Test-Path -LiteralPath $settingsPath)) {
+            throw "Missing ScriptAnalyzer settings file: $settingsPath"
+          }
+
+          Import-Module PSScriptAnalyzer -MinimumVersion 1.22.0 -Force | Out-Null
+          $targets = @('ITFabrik.Logger.psm1','Public','Private')
+          $issues = foreach ($target in $targets) {
+            Invoke-ScriptAnalyzer -Path $target -Recurse -Settings $settingsPath
+          }
+
+          if ($issues) {
+            $issues |
+              Sort-Object ScriptName, Line, RuleName |
+              Select-Object RuleName, Severity, ScriptName, Line, Message |
+              Format-Table -AutoSize
+            throw "ScriptAnalyzer found $($issues.Count) issue(s)."
+          } else {
+            Write-Host "ScriptAnalyzer passed with no issues." -ForegroundColor Green
+          }
+
       - name: Run Pester tests
         shell: pwsh
         run: |

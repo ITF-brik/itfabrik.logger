@@ -1,6 +1,5 @@
 function Format-LoggerLineCmtrace {
     param(
-        [Parameter(Mandatory)][string]$Timestamp,
         [Parameter(Mandatory)][string]$Severity,
         [Parameter(Mandatory)][string]$Component,
         [Parameter(Mandatory)][string]$Message,

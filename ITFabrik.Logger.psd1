@@ -1,6 +1,6 @@
 @{
     RootModule        = 'ITFabrik.Logger.psm1'
-    ModuleVersion     = '0.2.0'
+    ModuleVersion     = '0.2.1'
     GUID              = '0e0c9a7a-2f7e-4a44-8c3d-9f1e4b8a3f21'
     Author            = 'IT FABRIK'
     CompanyName       = 'IT FABRIK'

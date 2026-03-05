@@ -10,6 +10,9 @@ function Invoke-FileSink {
 
     $path = $Options.Path
     if (-not $path) { return }
+    $onError = ($Options.OnError | ForEach-Object { $_ }) -as [string]
+    if (-not $onError) { $onError = 'Warn' }
+    if ($onError -notin @('Warn','Continue','Throw')) { $onError = 'Warn' }
     $format   = ($Options.Format   | ForEach-Object { $_ }) -as [string]; if (-not $format) { $format = 'Default' }
     $rotation = ($Options.Rotation | ForEach-Object { $_ }) -as [string]
     $maxSizeMB = [double]($(if ($Options.ContainsKey('MaxSizeMB')) { $Options.MaxSizeMB } else { 5 }))
@@ -31,7 +34,14 @@ function Invoke-FileSink {
     }
 
     $dirToEnsure = Split-Path -Parent $effectivePath
-    if ($dirToEnsure -and -not (Test-Path -LiteralPath $dirToEnsure)) { New-Item -ItemType Directory -Path $dirToEnsure -Force | Out-Null }
+    if ($dirToEnsure -and -not (Test-Path -LiteralPath $dirToEnsure)) {
+        try {
+            New-Item -ItemType Directory -Path $dirToEnsure -Force -ErrorAction Stop | Out-Null
+        } catch {
+            Invoke-LoggerSinkError -Sink 'File' -Action 'creating target directory' -ErrorRecord $_ -Policy $onError
+            return
+        }
+    }
 
     # Rotation mode: NewFile -> archive existing file once per session before first write
     if ($rotation -match 'NewFile') {
@@ -55,7 +65,9 @@ function Invoke-FileSink {
                         }
                     }
                 }
-            } catch { }
+            } catch {
+                Invoke-LoggerSinkError -Sink 'File' -Action 'rotation NewFile' -ErrorRecord $_ -Policy $onError
+            }
             $script:FileSinkInitialized[$initKey] = $true
         }
     }
@@ -82,16 +94,16 @@ function Invoke-FileSink {
                     }
                 }
             }
-        } catch { }
+        } catch {
+            Invoke-LoggerSinkError -Sink 'File' -Action 'rotation Size' -ErrorRecord $_ -Policy $onError
+        }
     }
 
-    $indent = if ($IndentLevel -gt 0) { ' ' * ($IndentLevel * 2) } else { '' }
     $now = Get-Date
 
     switch -Regex ($format) {
         '^cmtrace$' {
-            $ts = $now.ToString('MM-dd-yyyy HH:mm:ss.fff')
-            $line = Format-LoggerLineCmtrace -Timestamp $ts -Severity $Severity -Component $Component -Message $Message -IndentLevel $IndentLevel
+            $line = Format-LoggerLineCmtrace -Severity $Severity -Component $Component -Message $Message -IndentLevel $IndentLevel
         }
         default {
             $ts = $now.ToString('yyyy-MM-dd HH:mm:ss')
@@ -125,5 +137,7 @@ function Invoke-FileSink {
         } else {
             [System.IO.File]::AppendAllText($effectivePath, $line + [Environment]::NewLine, $encObj)
         }
-    } catch { }
+    } catch {
+        Invoke-LoggerSinkError -Sink 'File' -Action 'writing log line' -ErrorRecord $_ -Policy $onError
+    }
 }

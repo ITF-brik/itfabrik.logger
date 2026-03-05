@@ -29,6 +29,7 @@ Describe 'Register-LoggerSink (parameter sets)' {
         [double]$s[0].Options.MaxSizeMB | Should -Be 1
         [int]$s[0].Options.MaxRolls | Should -Be 5
         $s[0].Options.Encoding | Should -Be 'ASCII'
+        $s[0].Options.OnError | Should -Be 'Warn'
     } }
 
     It 'registers File sink with Rotation NewFile' { InModuleScope 'ITFabrik.Logger' {
@@ -38,6 +39,26 @@ Describe 'Register-LoggerSink (parameter sets)' {
         $s.Count | Should -Be 1
         $s[0].Type | Should -Be 'File'
         $s[0].Options.Rotation | Should -Be 'NewFile'
+        $s[0].Options.OnError | Should -Be 'Warn'
+    } }
+
+    It 'registers File sink with custom OnError policy' { InModuleScope 'ITFabrik.Logger' {
+        $tmp = Join-Path $env:TEMP ("rg_sink_{0}.log" -f ([guid]::NewGuid().ToString('N')))
+        Register-LoggerSink -Type File -Path $tmp -OnError Throw
+        $s = ([LoggerService]::GetInstance()).GetSinks()
+        $s.Count | Should -Be 1
+        $s[0].Type | Should -Be 'File'
+        $s[0].Options.OnError | Should -Be 'Throw'
+    } }
+
+    It 'registers Web sink with options' { InModuleScope 'ITFabrik.Logger' {
+        Register-LoggerSink -Type Web -Url 'https://example.local/ingest' -APIKey 'abc' -Headers @{ 'X-Env' = 'dev' } -OnError Continue
+        $s = ([LoggerService]::GetInstance()).GetSinks()
+        $s.Count | Should -Be 1
+        $s[0].Type | Should -Be 'Web'
+        $s[0].Options.Url | Should -Be 'https://example.local/ingest'
+        $s[0].Options.APIKey | Should -Be 'abc'
+        $s[0].Options.Headers['X-Env'] | Should -Be 'dev'
+        $s[0].Options.OnError | Should -Be 'Continue'
     } }
 }
-

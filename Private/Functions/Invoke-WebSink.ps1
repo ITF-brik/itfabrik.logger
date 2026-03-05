@@ -10,6 +10,9 @@ function Invoke-WebSink {
 
     $url = $Options.Url
     if (-not $url) { return }
+    $onError = ($Options.OnError | ForEach-Object { $_ }) -as [string]
+    if (-not $onError) { $onError = 'Warn' }
+    if ($onError -notin @('Warn','Continue','Throw')) { $onError = 'Warn' }
     $apiKey = $Options.APIKey
     $headers = @{}
     if ($apiKey) { $headers['X-API-Key'] = $apiKey }
@@ -24,7 +27,8 @@ function Invoke-WebSink {
         processId  = $PID
     }
     try {
-        Invoke-RestMethod -Method Post -Uri $url -Headers $headers -Body ($payload | ConvertTo-Json -Depth 5) -ContentType 'application/json' -ErrorAction SilentlyContinue | Out-Null
-    } catch { }
+        Invoke-RestMethod -Method Post -Uri $url -Headers $headers -Body ($payload | ConvertTo-Json -Depth 5) -ContentType 'application/json' -ErrorAction Stop | Out-Null
+    } catch {
+        Invoke-LoggerSinkError -Sink 'Web' -Action 'posting HTTP payload' -ErrorRecord $_ -Policy $onError
+    }
 }
-

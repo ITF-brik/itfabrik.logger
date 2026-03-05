@@ -13,6 +13,7 @@ $requiredFiles = @('ITFabrik.Logger.psd1', 'ITFabrik.Logger.psm1', 'LICENSE', 'R
 if (-not (Test-Path -LiteralPath $ModulePath)) {
     throw "ModulePath introuvable: $ModulePath. Exécutez d'abord ./Scripts/Build-Module.ps1"
 }
+$ModulePath = (Resolve-Path -LiteralPath $ModulePath).Path
 
 $actualFiles = @(Get-ChildItem -LiteralPath $ModulePath -File | Select-Object -ExpandProperty Name)
 $missing = @($requiredFiles | Where-Object { $_ -notin $actualFiles })
@@ -23,6 +24,7 @@ if ($missing.Count -gt 0 -or $extra.Count -gt 0) {
 
 $manifest = Join-Path $ModulePath 'ITFabrik.Logger.psd1'
 if (-not (Test-Path -LiteralPath $manifest)) { throw "Manifest introuvable: $manifest" }
+$manifest = (Resolve-Path -LiteralPath $manifest).Path
 
 $name = (Import-PowerShellDataFile -LiteralPath $manifest).RootModule
 if (-not $name -or -not (Test-Path -LiteralPath (Join-Path $ModulePath $name))) {

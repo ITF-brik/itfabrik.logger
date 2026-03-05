@@ -32,10 +32,53 @@ jobs:
           }
           Write-Host "Tag/Version alignés: v$moduleVersion" -ForegroundColor Green
 
+      - name: Build module artifact
+        shell: pwsh
+        run: |
+          ./Scripts/Build-Module.ps1
+
+      - name: Validate artifact content (strict)
+        shell: pwsh
+        run: |
+          $modulePath = 'dist/ITFabrik.Logger'
+          $required = @('ITFabrik.Logger.psd1','ITFabrik.Logger.psm1','LICENSE','README.md')
+          if (-not (Test-Path -LiteralPath $modulePath)) {
+            throw "Artifact path not found: $modulePath"
+          }
+          $actual = @(Get-ChildItem -LiteralPath $modulePath -File | Select-Object -ExpandProperty Name)
+          $missing = @($required | Where-Object { $_ -notin $actual })
+          $extra = @($actual | Where-Object { $_ -notin $required })
+          if ($missing.Count -gt 0 -or $extra.Count -gt 0) {
+            throw ("Invalid artifact content. Missing: [{0}] Extra: [{1}]" -f ($missing -join ', '), ($extra -join ', '))
+          }
+          Write-Host "Artifact content is strict and valid." -ForegroundColor Green
+
+      - name: Install PSScriptAnalyzer 1.22+
+        shell: pwsh
+        run: |
+          $min = [version]'1.22.0'
+          $installed = Get-Module -ListAvailable PSScriptAnalyzer | Sort-Object Version -Descending | Select-Object -First 1
+          if (-not $installed -or $installed.Version -lt $min) {
+            Install-Module PSScriptAnalyzer -MinimumVersion 1.22.0 -Scope CurrentUser -Force -SkipPublisherCheck
+          } else {
+            Write-Host "PSScriptAnalyzer $($installed.Version) already available (>= $min)" -ForegroundColor Green
+          }
+
+      - name: Analyze built artifact (ScriptAnalyzer)
+        shell: pwsh
+        run: |
+          Import-Module PSScriptAnalyzer -MinimumVersion 1.22.0 -Force | Out-Null
+          $issues = Invoke-ScriptAnalyzer -Path 'dist/ITFabrik.Logger/ITFabrik.Logger.psm1' -Settings 'PSScriptAnalyzerSettings.psd1'
+          if ($issues) {
+            $issues | Select-Object RuleName, Severity, ScriptName, Line, Message | Format-Table -AutoSize
+            throw "ScriptAnalyzer found $($issues.Count) issue(s) in built artifact."
+          }
+          Write-Host "Built artifact passed ScriptAnalyzer." -ForegroundColor Green
+
       - name: Publish Module
         shell: pwsh
         env:
           PSGALLERY_API_KEY: ${{ secrets.PSGALLERY_API_KEY }}
         run: |
           if (-not $env:PSGALLERY_API_KEY) { throw 'Secret PSGALLERY_API_KEY manquant' }
-          ./Scripts/Publish-PSGallery.ps1 -ApiKey $env:PSGALLERY_API_KEY
+          ./Scripts/Publish-PSGallery.ps1 -ApiKey $env:PSGALLERY_API_KEY -ModulePath 'dist/ITFabrik.Logger'

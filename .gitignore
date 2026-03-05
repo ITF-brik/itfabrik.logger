@@ -39,3 +39,7 @@ coverage/
 # Node / tooling (if any)
 node_modules/
 
+# Local planning workspace files
+findings.md
+progress.md
+task_plan.md

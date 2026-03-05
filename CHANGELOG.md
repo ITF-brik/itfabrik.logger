@@ -5,13 +5,22 @@ The format is based on Keep a Changelog, and this project adheres to SemVer.
 
 ## [Unreleased] (0.2.0)
 ### Added
-- Helper partagé pour préfixe de message (icône/padding/indentation/StepName) [planned]
-- Exposition StepName (+ ForegroundColor optionnel) jusqu’aux sinks [planned]
-- Exemples de config psd1/JSON + Initialize-LoggerFromConfig [planned]
-- Tests Pester supplémentaires (indentations multiples, padding Severity, cas limites Cmtrace) [planned]
+- Script de build `Scripts/Build-Module.ps1` pour générer un artifact minimal dans `dist/ITFabrik.Logger`.
+- Exposition publique du sink Web via `Register-LoggerSink -Type Web` (`Url`, `APIKey`, `Headers`, `OnError`).
+- Politique d'erreur explicite des sinks (`OnError = Warn|Continue|Throw`) et helper `Invoke-LoggerSinkError`.
+- Couverture tests Pester pour la politique d'erreur et l'enregistrement des sinks.
+- Fichier de settings `PSScriptAnalyzerSettings.psd1`.
 
 ### Changed
-- Documentation et README à ajuster suite aux nouvelles API [planned]
+- Publication PSGallery basée sur artifact buildé (`dist/ITFabrik.Logger`) au lieu de la racine source.
+- `Scripts/Publish-PSGallery.ps1` valide strictement le contenu artifact, le manifeste et l'import avant publication.
+- Workflow `publish.yml` enrichi: build, contrôle strict des 4 fichiers, ScriptAnalyzer sur artifact, puis publish.
+- Suppression de l'effet de bord à l'import: le module n'installe plus automatiquement la variable globale logger.
+- Positionnement produit migré vers **ITFabrik.Stepper** (contrat `StepManagerLogger` conservé en legacy compat).
+- Documentation release mise à jour pour la chaîne `build -> validate -> publish` et rollback associé.
+
+### Fixed
+- Suppression des `catch {}` silencieux dans les sinks fichier/web et meilleure observabilité des erreurs.
 
 ## [0.1.0] - 2025-11-03
 ### Added

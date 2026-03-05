@@ -1,9 +1,9 @@
 # Sink Console
 
-- Format: identique à `Write-StepMessage` (icônes PS7+, padding, couleurs).
+- Format: identique à l'affichage `Write-Log` d'ITFabrik.Stepper (icônes PS7+, padding, couleurs).
 - Indentation: `IndentLevel` (2 espaces par niveau) avant le message.
 - StepName: affiché entre crochets s'il est fourni.
-- Component: non affiché (évite la duplication avec StepManager).
+- Component: non affiché (évite la duplication avec ITFabrik.Stepper).
 
 Note
 - Padding de sévérité et indentation sont alignés avec le format Fichier (Default) grâce au helper partagé `Get-LoggerPrefix`.

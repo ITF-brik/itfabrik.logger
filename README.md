@@ -7,7 +7,7 @@
 [![Release](https://img.shields.io/github/v/release/ITF-brik/itfabrik.logger?display_name=tag&sort=semver)](https://github.com/ITF-brik/itfabrik.logger/releases)
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 
-Logger est un module PowerShell de journalisation compatible StepManager via la variable globale `$StepManagerLogger`. Il fournit des sinks Console et Fichier avec formats configurables, rotation et encodage, et s’intègre automatiquement à StepManager pour un affichage cohérent (icônes, couleurs, indentation).
+Logger est un module PowerShell de journalisation compatible ITFabrik.Stepper via la variable globale legacy `$StepManagerLogger`. Il fournit des sinks Console et Fichier avec formats configurables, rotation et encodage, et s’intègre explicitement à ITFabrik.Stepper après initialisation du logger pour un affichage cohérent (icônes, couleurs, indentation).
 
 ---
 
@@ -66,11 +66,23 @@ Invoke-Pester -Configuration $cfg
 Invoke-Pester -Path Tests
 ```
 
+- Analyse statique (ScriptAnalyzer):
+
+```powershell
+Import-Module PSScriptAnalyzer -MinimumVersion 1.22.0 -Force
+$targets = @('ITFabrik.Logger.psm1','Public','Private')
+$issues = foreach ($target in $targets) {
+  Invoke-ScriptAnalyzer -Path $target -Recurse -Settings 'PSScriptAnalyzerSettings.psd1'
+}
+$issues | Format-Table -AutoSize
+```
+
 ## Fonctionnalités
 
-- Intégration StepManager automatique via `$Global:StepManagerLogger`.
-- Sink Console: rendu aligné sur `Write-StepMessage` (icônes PowerShell 7+, couleurs, indentation).
+- Intégration ITFabrik.Stepper explicite via `$Global:StepManagerLogger` (nom legacy conservé pour compatibilité) après appel d’une fonction d’initialisation.
+- Sink Console: rendu aligné sur l'affichage `Write-Log` d'ITFabrik.Stepper (icônes PowerShell 7+, couleurs, indentation).
 - Sink Fichier: formats `Default` et `Cmtrace` (XML-like compatible cmtrace.exe).
+- Sink Web: POST JSON HTTP (`Url`, `APIKey`, `Headers`), avec politique d'erreur `OnError`.
 - Rotation de fichiers: `NewFile`, `Size`, `Daily` ou aucune.
 - Encodages configurables: `UTF8BOM` (défaut), `UTF8`, `Unicode`, etc.
 - Niveaux de sévérité: `Info`, `Success`, `Warning`, `Error`, `Debug`, `Verbose`.
@@ -84,8 +96,8 @@ Invoke-Pester -Path Tests
 Import-Module ITFabrik.Logger -Force
 Initialize-LoggerConsole
 
-# Avec StepManager (recommandé)
-Import-Module StepManager -Force
+# Avec ITFabrik.Stepper (recommandé)
+Import-Module ITFabrik.Stepper -Force
 Write-Log -Message 'Démarrage du traitement' -Severity Info
 Write-Log -Message 'Traitement terminé' -Severity Success
 ```
@@ -103,14 +115,14 @@ Exemple d’affichage console attendu (PowerShell 7+, console UTF-8):
 Import-Module ITFabrik.Logger -Force
 Initialize-LoggerFile -Path "$env:TEMP\app.log"
 
-Import-Module StepManager -Force
+Import-Module ITFabrik.Stepper -Force
 Write-Log -Message 'Écriture dans le fichier' -Severity Info
 ```
 
 Ligne générée en format `Default` (exemple):
 
 ```text
-[2025-10-24 10:31:57] [      Info] [StepManager]  Écriture dans le fichier
+[2025-10-24 10:31:57] [      Info] [ITFabrik.Stepper]  Écriture dans le fichier
 ```
 
 ### Format CMTrace pour compatibilité cmtrace.exe
@@ -120,14 +132,14 @@ Import-Module ITFabrik.Logger -Force
 Initialize-LoggerService -Reset
 Register-LoggerSink -Type File -Path "$env:TEMP\app.cmtrace.log" -FileFormat Cmtrace -Rotation NewFile -Encoding UTF8BOM
 
-Import-Module StepManager -Force
+Import-Module ITFabrik.Stepper -Force
 Write-Log -Message 'Message compatible CMTrace' -Severity Warning
 ```
 
 Extrait (XML-like) attendu:
 
 ```text
-<![LOG[Message compatible CMTrace]LOG]!><time="12:00:00.123456" date="10-24-2025" component="StepManager" context="User" type="2" thread="42" file="">
+<![LOG[Message compatible CMTrace]LOG]!><time="12:00:00.123456" date="10-24-2025" component="ITFabrik.Stepper" context="User" type="2" thread="42" file="">
 ```
 
 ### Deux sinks en parallèle (console + fichier)
@@ -138,8 +150,19 @@ Initialize-LoggerService -Reset
 Register-LoggerSink -Type Console -Format Default
 Register-LoggerSink -Type File -Path "$env:TEMP\app.log" -Rotation Size -MaxSizeMB 1 -MaxRolls 3
 
-Import-Module StepManager -Force
+Import-Module ITFabrik.Stepper -Force
 Write-Log -Message 'Visible console et écrit dans app.log' -Severity Info
+```
+
+### Sink Web (HTTP JSON)
+
+```powershell
+Import-Module ITFabrik.Logger -Force
+Initialize-LoggerService -Reset
+Register-LoggerSink -Type Web -Url 'https://example.local/api/logs' -APIKey 'abc' -Headers @{ 'X-Env' = 'prod' } -OnError Warn
+
+Import-Module ITFabrik.Stepper -Force
+Write-Log -Message 'Envoi vers endpoint HTTP' -Severity Info
 ```
 
 ### Rotation
@@ -157,10 +180,10 @@ Initialize-LoggerService -Reset
 Register-LoggerSink -Type File -Path "$env:TEMP\app.log" -Rotation Daily
 ```
 
-### Désactiver le logger StepManager
+### Désactiver le logger ITFabrik.Stepper
 
 ```powershell
-Disable-Logger   # supprime $Global:StepManagerLogger
+Disable-Logger   # supprime `$Global:StepManagerLogger` (nom legacy)
 ```
 
 ---
@@ -168,9 +191,9 @@ Disable-Logger   # supprime $Global:StepManagerLogger
 ## Contrat de retour
 
 - `Initialize-LoggerService`, `Initialize-LoggerConsole`, `Initialize-LoggerFile`, `Register-LoggerSink`, `Disable-Logger` n’émettent pas de sortie par défaut.
-- Le logger StepManager exposé est un scriptblock global: `$Global:StepManagerLogger`.
+- Le logger exposé pour ITFabrik.Stepper est un scriptblock global: `$Global:StepManagerLogger` (nom legacy conservé).
 
-## Signature attendue du logger StepManager
+## Signature attendue du logger ITFabrik.Stepper
 
 ```powershell
 $Global:StepManagerLogger = {
@@ -185,7 +208,7 @@ $Global:StepManagerLogger = {
 }
 ```
 
-Ce module installe et alimente automatiquement cette variable lors de l’initialisation du service. Vous pouvez la remplacer par votre propre implémentation si besoin.
+Ce module installe et alimente cette variable lors de l’initialisation du service. Le nom `StepManagerLogger` est conservé pour compatibilité avec ITFabrik.Stepper. Vous pouvez la remplacer par votre propre implémentation si besoin.
 
 ---
 
@@ -193,6 +216,7 @@ Ce module installe et alimente automatiquement cette variable lors de l’initia
 
 - Formats: `docs/formats/default.md`, `docs/formats/cmtrace.md`
 - Sinks: `docs/sinks/console.md`, `docs/sinks/file.md`
+- Sinks: `docs/sinks/console.md`, `docs/sinks/file.md`, `docs/sinks/web.md`
 - Configuration: `docs/configuration.md`
 - Rotation: `docs/rotation.md`
 - Dépannage: `docs/troubleshooting.md`
@@ -207,3 +231,4 @@ Apache-2.0 - voir `LICENSE`.
 
 
 ---
+

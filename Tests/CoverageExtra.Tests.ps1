@@ -17,9 +17,7 @@ Describe 'Additional coverage for console, file, web' {
         InModuleScope 'ITFabrik.Logger' {
             Mock Invoke-WebSink -ModuleName 'ITFabrik.Logger' {}
             Initialize-LoggerService -Reset
-            # Injection d'un sink Web directement via le service
-            $svc = [LoggerService]::GetInstance()
-            $svc.RegisterSink('Web', @{ Url = 'https://example.local/ingest' })
+            Register-LoggerSink -Type Web -Url 'https://example.local/ingest'
             & $Global:StepManagerLogger 'Comp' 'Msg' 'Info' 0
             Should -Invoke -CommandName Invoke-WebSink -Times 1 -Exactly
         }

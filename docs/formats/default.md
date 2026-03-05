@@ -2,7 +2,7 @@
 
 Rendu
 - `[$Timestamp] [<Severity pad à 10>] [Component]<indent> Message`
-- Exemple: `[2025-10-24 10:31:57] [      Info] [StepManager]    Démarrage`
+- Exemple: `[2025-10-24 10:31:57] [      Info] [ITFabrik.Stepper]    Démarrage`
 
 Détails
 - Severité à largeur fixe (10), alignée à droite dans les crochets.

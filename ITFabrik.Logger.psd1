@@ -5,7 +5,7 @@
     Author            = 'IT FABRIK'
     CompanyName       = 'IT FABRIK'
     Copyright        = '(c) IT FABRIK. All rights reserved.'
-    Description       = 'Logger: Implemente un logger compatible StepManager via la variable StepManagerLogger.'
+    Description       = 'Logger: Implemente un logger compatible ITFabrik.Stepper via la variable legacy StepManagerLogger.'
     PowerShellVersion = '5.1'
     CompatiblePSEditions = @('Desktop','Core')
     FunctionsToExport = @('Initialize-LoggerService','Register-LoggerSink','Initialize-LoggerConsole','Initialize-LoggerFile','Disable-Logger')
@@ -16,8 +16,7 @@
     FormatsToProcess = @()
     PrivateData       = @{
         PSData = @{
-            Tags = @('logging','StepManager','console')
+            Tags = @('logging','ITFabrik.Stepper','stepper','console')
         }
     }
 }
-

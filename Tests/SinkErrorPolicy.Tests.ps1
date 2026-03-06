@@ -53,4 +53,26 @@ Describe 'Sink error policy (OnError)' {
         { & $Global:StepManagerLogger 'Comp' 'Hello' 'Info' 0 } | Should -Throw
         Should -Invoke -CommandName Write-Warning -Times 0
     } }
+
+    It 'warns and continues on Serilog sink failure by default' { InModuleScope 'ITFabrik.Logger' {
+        Mock Invoke-RestMethod -ModuleName 'ITFabrik.Logger' { throw 'http failed' }
+        Mock Write-Warning -ModuleName 'ITFabrik.Logger' {}
+
+        Initialize-LoggerService -Reset
+        Register-LoggerSink -Type Serilog -Url 'https://example.local/serilog'
+
+        { & $Global:StepManagerLogger 'Comp' 'Hello' 'Info' 0 } | Should -Not -Throw
+        Should -Invoke -CommandName Write-Warning -Times 1 -Exactly
+    } }
+
+    It 'throws when OnError is Throw on Serilog sink failure' { InModuleScope 'ITFabrik.Logger' {
+        Mock Invoke-RestMethod -ModuleName 'ITFabrik.Logger' { throw 'http failed' }
+        Mock Write-Warning -ModuleName 'ITFabrik.Logger' {}
+
+        Initialize-LoggerService -Reset
+        Register-LoggerSink -Type Serilog -Url 'https://example.local/serilog' -OnError Throw
+
+        { & $Global:StepManagerLogger 'Comp' 'Hello' 'Info' 0 } | Should -Throw
+        Should -Invoke -CommandName Write-Warning -Times 0
+    } }
 }

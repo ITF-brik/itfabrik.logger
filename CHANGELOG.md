@@ -5,6 +5,17 @@ The format is based on Keep a Changelog, and this project adheres to SemVer.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-03-06
+### Added
+- Nouveau sink `Serilog` disponible via `Register-LoggerSink -Type Serilog`.
+- Nouveau raccourci public `Initialize-LoggerSerilog`.
+- Projection HTTP JSON Serilog-like avec `Timestamp`, `Level`, `MessageTemplate`, `RenderedMessage` et `Properties`.
+- Documentation dédiée du sink Serilog avec exemples d'usage.
+
+### Changed
+- Le module exporte désormais `Initialize-LoggerSerilog`.
+- La documentation utilisateur couvre maintenant l'usage du sink Serilog en complément des sinks `Console`, `File` et `Web`.
+
 ## [0.2.2] - 2026-03-05
 ### Fixed
 - Format de ligne `Default` du sink fichier: indentation appliquée au message (après `[Component]`) pour garder une colonne composant stable.
@@ -62,7 +73,8 @@ The format is based on Keep a Changelog, and this project adheres to SemVer.
 
 ---
 
-[Unreleased]: https://github.com/ITF-brik/itfabrik.logger/compare/v0.2.2...HEAD
+[Unreleased]: https://github.com/ITF-brik/itfabrik.logger/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/ITF-brik/itfabrik.logger/releases/tag/v0.3.0
 [0.2.2]: https://github.com/ITF-brik/itfabrik.logger/releases/tag/v0.2.2
 [0.2.1]: https://github.com/ITF-brik/itfabrik.logger/releases/tag/v0.2.1
 [0.2.0]: https://github.com/ITF-brik/itfabrik.logger/releases/tag/v0.2.0

@@ -10,6 +10,6 @@ Get-ChildItem -Path "$PSScriptRoot\Public" -Filter *.ps1 -File -ErrorAction Sile
 
 # No global logger side effect at import time.
 # Consumers must explicitly initialize via Initialize-LoggerConsole,
-# Initialize-LoggerFile, or Initialize-LoggerService.
+# Initialize-LoggerFile, Initialize-LoggerSerilog, or Initialize-LoggerService.
 
-Export-ModuleMember -Function Initialize-LoggerService,Register-LoggerSink,Initialize-LoggerConsole,Initialize-LoggerFile,Disable-Logger
+Export-ModuleMember -Function Initialize-LoggerService,Register-LoggerSink,Initialize-LoggerConsole,Initialize-LoggerFile,Initialize-LoggerSerilog,Disable-Logger

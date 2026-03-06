@@ -61,4 +61,15 @@ Describe 'Register-LoggerSink (parameter sets)' {
         $s[0].Options.Headers['X-Env'] | Should -Be 'dev'
         $s[0].Options.OnError | Should -Be 'Continue'
     } }
+
+    It 'registers Serilog sink with options' { InModuleScope 'ITFabrik.Logger' {
+        Register-LoggerSink -Type Serilog -Url 'https://example.local/serilog' -APIKey 'abc' -Headers @{ 'X-App' = 'logger' } -OnError Throw
+        $s = ([LoggerService]::GetInstance()).GetSinks()
+        $s.Count | Should -Be 1
+        $s[0].Type | Should -Be 'Serilog'
+        $s[0].Options.Url | Should -Be 'https://example.local/serilog'
+        $s[0].Options.APIKey | Should -Be 'abc'
+        $s[0].Options.Headers['X-App'] | Should -Be 'logger'
+        $s[0].Options.OnError | Should -Be 'Throw'
+    } }
 }

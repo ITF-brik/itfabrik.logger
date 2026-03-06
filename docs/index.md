@@ -5,6 +5,7 @@ Bienvenue. Cette documentation décrit l'usage du module ITFabrik.Logger, ses si
 - Voir `docs/sinks/console.md` pour la console.
 - Voir `docs/sinks/file.md` pour la sortie fichier (rotations, encodages).
 - Voir `docs/sinks/web.md` pour l'envoi HTTP JSON.
+- Voir `docs/sinks/serilog.md` pour le sink HTTP JSON structure Serilog-like.
 - Voir `docs/formats/default.md` et `docs/formats/cmtrace.md` pour les formats.
 - Voir `docs/rotation.md` pour les stratégies de rotation.
 - Voir `docs/configuration.md` pour l'initialisation et l'enregistrement des sinks.

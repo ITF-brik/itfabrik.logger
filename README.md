@@ -7,7 +7,7 @@
 [![Release](https://img.shields.io/github/v/release/ITF-brik/itfabrik.logger?display_name=tag&sort=semver)](https://github.com/ITF-brik/itfabrik.logger/releases)
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 
-Logger est un module PowerShell de journalisation compatible ITFabrik.Stepper via la variable globale legacy `$StepManagerLogger`. Il fournit des sinks Console et Fichier avec formats configurables, rotation et encodage, et s’intègre explicitement à ITFabrik.Stepper après initialisation du logger pour un affichage cohérent (icônes, couleurs, indentation).
+Logger est un module PowerShell de journalisation compatible ITFabrik.Stepper via la variable globale legacy `$StepManagerLogger`. Il fournit des sinks Console, Fichier, Web et Serilog avec formats configurables, rotation et encodage, et s’intègre explicitement à ITFabrik.Stepper après initialisation du logger pour un affichage cohérent (icônes, couleurs, indentation).
 
 ---
 
@@ -83,6 +83,7 @@ $issues | Format-Table -AutoSize
 - Sink Console: rendu aligné sur l'affichage `Write-Log` d'ITFabrik.Stepper (icônes PowerShell 7+, couleurs, indentation).
 - Sink Fichier: formats `Default` et `Cmtrace` (XML-like compatible cmtrace.exe).
 - Sink Web: POST JSON HTTP (`Url`, `APIKey`, `Headers`), avec politique d'erreur `OnError`.
+- Sink Serilog: POST JSON structure Serilog-like (`Timestamp`, `Level`, `MessageTemplate`, `RenderedMessage`, `Properties`) pour intégration simple avec des endpoints orientés Serilog.
 - Rotation de fichiers: `NewFile`, `Size`, `Daily` ou aucune.
 - Encodages configurables: `UTF8BOM` (défaut), `UTF8`, `Unicode`, etc.
 - Niveaux de sévérité: `Info`, `Success`, `Warning`, `Error`, `Debug`, `Verbose`.
@@ -165,6 +166,36 @@ Import-Module ITFabrik.Stepper -Force
 Write-Log -Message 'Envoi vers endpoint HTTP' -Severity Info
 ```
 
+### Sink Serilog (HTTP JSON structure)
+
+```powershell
+Import-Module ITFabrik.Logger -Force
+Initialize-LoggerSerilog -Url 'https://example.local/api/serilog' -APIKey 'abc' -Headers @{ 'X-Env' = 'prod' } -OnError Warn
+
+Import-Module ITFabrik.Stepper -Force
+Write-Log -Message 'Processed order 42' -Severity Success
+```
+
+Charge utile envoyee (exemple):
+
+```json
+{
+  "Timestamp": "2026-03-06T10:30:00.0000000+01:00",
+  "Level": "Information",
+  "MessageTemplate": "Processed order 42",
+  "RenderedMessage": "Processed order 42",
+  "Properties": {
+    "Component": "ITFabrik.Stepper",
+    "SourceContext": "ITFabrik.Stepper",
+    "IndentLevel": 0,
+    "Host": "HOST01",
+    "ProcessId": 1234,
+    "OriginalSeverity": "Success",
+    "Outcome": "Success"
+  }
+}
+```
+
 ### Rotation
 
 ```powershell
@@ -190,7 +221,7 @@ Disable-Logger   # supprime `$Global:StepManagerLogger` (nom legacy)
 
 ## Contrat de retour
 
-- `Initialize-LoggerService`, `Initialize-LoggerConsole`, `Initialize-LoggerFile`, `Register-LoggerSink`, `Disable-Logger` n’émettent pas de sortie par défaut.
+- `Initialize-LoggerService`, `Initialize-LoggerConsole`, `Initialize-LoggerFile`, `Initialize-LoggerSerilog`, `Register-LoggerSink`, `Disable-Logger` n’émettent pas de sortie par défaut.
 - Le logger exposé pour ITFabrik.Stepper est un scriptblock global: `$Global:StepManagerLogger` (nom legacy conservé).
 
 ## Signature attendue du logger ITFabrik.Stepper
@@ -216,7 +247,7 @@ Ce module installe et alimente cette variable lors de l’initialisation du serv
 
 - Formats: `docs/formats/default.md`, `docs/formats/cmtrace.md`
 - Sinks: `docs/sinks/console.md`, `docs/sinks/file.md`
-- Sinks: `docs/sinks/console.md`, `docs/sinks/file.md`, `docs/sinks/web.md`
+- Sinks: `docs/sinks/console.md`, `docs/sinks/file.md`, `docs/sinks/web.md`, `docs/sinks/serilog.md`
 - Configuration: `docs/configuration.md`
 - Rotation: `docs/rotation.md`
 - Dépannage: `docs/troubleshooting.md`

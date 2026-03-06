@@ -21,7 +21,7 @@ Describe 'Prefix snapshot (shared helper)' {
     It 'File(Default) line stays stable (Info, indent=2)' { InModuleScope 'ITFabrik.Logger' {
         $ts = '2025-01-01 12:34:56'
         $line = Format-LoggerLineDefault -Timestamp $ts -Severity 'Info' -Component 'Unit' -Message 'Msg' -IndentLevel 2
-        $expected = "[$ts] [" + (' ' * 6) + "Info]" + (' ' * 4) + "[Unit] Msg"
+        $expected = "[$ts] [" + (' ' * 6) + "Info][Unit]" + (' ' * 5) + "Msg"
         $line | Should -Be $expected
     } }
 }

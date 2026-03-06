@@ -5,6 +5,10 @@ The format is based on Keep a Changelog, and this project adheres to SemVer.
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-03-06
+### Fixed
+- Test snapshot `File(Default)` réaligné avec le format de ligne stable actuel, ce qui corrige l'échec des workflows `CI - Tests` et `CI - Coverage`.
+
 ## [0.3.0] - 2026-03-06
 ### Added
 - Nouveau sink `Serilog` disponible via `Register-LoggerSink -Type Serilog`.
@@ -73,7 +77,8 @@ The format is based on Keep a Changelog, and this project adheres to SemVer.
 
 ---
 
-[Unreleased]: https://github.com/ITF-brik/itfabrik.logger/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/ITF-brik/itfabrik.logger/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/ITF-brik/itfabrik.logger/releases/tag/v0.3.1
 [0.3.0]: https://github.com/ITF-brik/itfabrik.logger/releases/tag/v0.3.0
 [0.2.2]: https://github.com/ITF-brik/itfabrik.logger/releases/tag/v0.2.2
 [0.2.1]: https://github.com/ITF-brik/itfabrik.logger/releases/tag/v0.2.1

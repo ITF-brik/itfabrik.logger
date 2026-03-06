@@ -6,6 +6,5 @@ Rendu XML-like compatible `cmtrace.exe`
 - L’encodage du fichier doit être `UTF8BOM` (recommandé) ou `Unicode` pour un affichage correct des accents.
 
 Remarques
-- Le paramètre `Timestamp` n’est pas utilisé directement; l’heure/date sont recalculées.
+- Si un `Timestamp` est fourni par le dispatcher, il est utilisé pour `time` et `date`; sinon l’heure courante est utilisée.
 - L’indentation optionnelle peut précéder le message (préfixes arbre pris en charge si configurés).
-

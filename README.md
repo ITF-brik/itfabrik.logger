@@ -84,6 +84,7 @@ $issues | Format-Table -AutoSize
 - Sink Fichier: formats `Default` et `Cmtrace` (XML-like compatible cmtrace.exe).
 - Sink Web: POST JSON HTTP (`Url`, `APIKey`, `Headers`), avec politique d'erreur `OnError`.
 - Sink Serilog: POST JSON structure Serilog-like (`Timestamp`, `Level`, `MessageTemplate`, `RenderedMessage`, `Properties`) pour intégration simple avec des endpoints orientés Serilog.
+- Compatibilité Stepper parallèle: un `Timestamp` optionnel peut être transmis au dispatcher global pour préserver l'horodatage réel des logs rejoués.
 - Rotation de fichiers: `NewFile`, `Size`, `Daily` ou aucune.
 - Encodages configurables: `UTF8BOM` (défaut), `UTF8`, `Unicode`, etc.
 - Niveaux de sévérité: `Info`, `Success`, `Warning`, `Error`, `Debug`, `Verbose`.
@@ -233,13 +234,14 @@ $Global:StepManagerLogger = {
         [string]$Message,
         [ValidateSet('Info','Success','Warning','Error','Debug','Verbose')]
         [string]$Severity,
-        [int]$IndentLevel
+        [int]$IndentLevel,
+        [Nullable[datetime]]$Timestamp = $null
     )
     # ...implémentation...
 }
 ```
 
-Ce module installe et alimente cette variable lors de l’initialisation du service. Le nom `StepManagerLogger` est conservé pour compatibilité avec ITFabrik.Stepper. Vous pouvez la remplacer par votre propre implémentation si besoin.
+Si `Timestamp` est fourni, le logger l'utilise comme horodatage effectif. Sinon, le comportement historique reste inchangé et l'heure courante est utilisée. Le nom `StepManagerLogger` est conservé pour compatibilité avec ITFabrik.Stepper. Vous pouvez la remplacer par votre propre implémentation si besoin.
 
 ---
 

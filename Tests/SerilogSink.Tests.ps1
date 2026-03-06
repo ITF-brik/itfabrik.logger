@@ -47,6 +47,26 @@ Describe 'Serilog Sink (Invoke-SerilogSink)' {
         }
     }
 
+    It 'uses a provided timestamp in the Serilog payload' {
+        InModuleScope 'ITFabrik.Logger' {
+            $script:targetUrl = 'https://example.local/api/serilog'
+            $script:capturedCall = $null
+
+            Mock Invoke-RestMethod -ModuleName 'ITFabrik.Logger' -MockWith {
+                param($Method, $Uri, $Headers, $Body, $ContentType, $ErrorAction)
+                $script:capturedCall = @{
+                    Body = $Body
+                }
+            } -Verifiable
+
+            Invoke-SerilogSink -Options @{ Url = $script:targetUrl } -Component 'Unit.Component' -Message 'Processed item' -Severity 'Info' -IndentLevel 2 -Timestamp ([datetime]'2025-01-01 12:34:56')
+
+            Should -Invoke -CommandName Invoke-RestMethod -Times 1 -Exactly
+            $payload = $script:capturedCall.Body | ConvertFrom-Json -Depth 10
+            $payload.Timestamp | Should -Be '2025-01-01T12:34:56.0000000'
+        }
+    }
+
     It 'initializes the service with a Serilog sink shortcut' {
         InModuleScope 'ITFabrik.Logger' {
             Initialize-LoggerSerilog -Url 'https://example.local/api/serilog' -APIKey 'key' -Headers @{ 'X-Test' = '1' }

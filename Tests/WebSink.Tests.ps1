@@ -23,5 +23,21 @@ Describe 'Web Sink (Invoke-WebSink)' {
             Should -Invoke -CommandName Invoke-RestMethod -Times 1 -Exactly
         }
     }
-}
 
+    It 'uses a provided timestamp in the web payload' {
+        InModuleScope 'ITFabrik.Logger' {
+            $script:targetUrl = 'https://example.local/api/logs'
+            $script:capturedBody = $null
+            Mock Invoke-RestMethod -ModuleName 'ITFabrik.Logger' -MockWith {
+                param($Method, $Uri, $Headers, $Body, $ContentType, $ErrorAction)
+                $script:capturedBody = $Body
+            } -Verifiable
+
+            Invoke-WebSink -Options @{ Url = $script:targetUrl } -Component 'Unit' -Message 'Hi' -Severity 'Info' -IndentLevel 1 -Timestamp ([datetime]'2025-01-01 12:34:56')
+
+            Should -Invoke -CommandName Invoke-RestMethod -Times 1 -Exactly
+            $payload = $script:capturedBody | ConvertFrom-Json -Depth 10
+            $payload.timestamp | Should -Be '2025-01-01T12:34:56.0000000'
+        }
+    }
+}

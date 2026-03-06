@@ -12,6 +12,12 @@ Describe 'Console Logger (color and format)' {
     It 'formats Error with Red' { InModuleScope 'ITFabrik.Logger' { $o = Format-ConsoleMessage -Component 'Unit' -Message 'Msg' -Severity 'Error' -IndentLevel 2; $o.ForegroundColor | Should -Be 'Red'; $o.Text | Should -Match '\[Error\]' } }
     It 'formats Debug with Cyan' { InModuleScope 'ITFabrik.Logger' { $o = Format-ConsoleMessage -Component 'Unit' -Message 'Msg' -Severity 'Debug' -IndentLevel 2; $o.ForegroundColor | Should -Be 'Cyan'; $o.Text | Should -Match '\[Debug\]' } }
     It 'formats Verbose with Magenta' { InModuleScope 'ITFabrik.Logger' { $o = Format-ConsoleMessage -Component 'Unit' -Message 'Msg' -Severity 'Verbose' -IndentLevel 2; $o.ForegroundColor | Should -Be 'Magenta'; $o.Text | Should -Match '\[Verbose\]' } }
+    It 'uses a provided timestamp in console output' { InModuleScope 'ITFabrik.Logger' { $o = Format-ConsoleMessage -Component 'Unit' -Message 'Msg' -Severity 'Info' -IndentLevel 2 -Timestamp ([datetime]'2025-01-01 12:34:56'); $o.Text | Should -Match '^\[2025-01-01 12:34:56\]' } }
+    It 'falls back to Get-Date when timestamp is absent' { InModuleScope 'ITFabrik.Logger' {
+        Mock Get-Date -ModuleName 'ITFabrik.Logger' { [datetime]'2025-01-01 12:34:56' }
+        $o = Format-ConsoleMessage -Component 'Unit' -Message 'Msg' -Severity 'Info'
+        $o.Text | Should -Match '^\[2025-01-01 12:34:56\]'
+    } }
 }
 
 

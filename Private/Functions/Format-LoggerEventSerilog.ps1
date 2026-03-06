@@ -4,7 +4,8 @@ function Format-LoggerEventSerilog {
         [Parameter(Mandatory)][string]$Component,
         [Parameter(Mandatory)][string]$Message,
         [Parameter(Mandatory)][ValidateSet('Info','Success','Warning','Error','Debug','Verbose')][string]$Severity,
-        [int]$IndentLevel = 0
+        [int]$IndentLevel = 0,
+        [AllowNull()][Nullable[datetime]]$Timestamp = $null
     )
 
     $levelMap = @{
@@ -16,6 +17,7 @@ function Format-LoggerEventSerilog {
         Verbose = 'Verbose'
     }
 
+    $effectiveTimestamp = Resolve-LoggerTimestamp -Timestamp $Timestamp
     $properties = [ordered]@{
         Component        = $Component
         SourceContext    = $Component
@@ -30,7 +32,7 @@ function Format-LoggerEventSerilog {
     }
 
     return [ordered]@{
-        Timestamp       = (Get-Date).ToString('o')
+        Timestamp       = $effectiveTimestamp.ToString('o')
         Level           = $levelMap[$Severity]
         MessageTemplate = $Message
         RenderedMessage = $Message

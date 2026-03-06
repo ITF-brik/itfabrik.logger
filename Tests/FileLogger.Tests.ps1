@@ -19,6 +19,13 @@ Describe 'File Logger' {
         Get-Content -LiteralPath $script:TestLog -Raw | Should -Match 'Hello world'
     }
 
+    It 'uses a provided timestamp in default file output' {
+        Initialize-LoggerFile -Path $script:TestLog -MaxSizeMB 10 -MaxRolls 2
+        & $Global:StepManagerLogger 'Unit' 'Hello world' 'Info' 0 ([datetime]'2025-01-01 12:34:56')
+        Start-Sleep -Milliseconds 50
+        Get-Content -LiteralPath $script:TestLog -Raw | Should -Match '\[2025-01-01 12:34:56\]'
+    }
+
     It 'rotates when exceeding max size' {
         Initialize-LoggerFile -Path $script:TestLog -Rotation Size -MaxSizeMB 0.001 -MaxRolls 2
         $msg = 'X' * 5000

@@ -6,11 +6,12 @@ function Invoke-SMConsoleLogger {
         [Parameter(Mandatory)] [string]$Message,
         [Parameter(Mandatory)] [ValidateSet('Info','Success','Warning','Error','Debug','Verbose')] [string]$Severity,
         [int]$IndentLevel = 0,
+        [AllowNull()][Nullable[datetime]]$Timestamp = $null,
         [string]$StepName = '',
         [string]$ForegroundColor
     )
 
-    $obj = Format-ConsoleMessage -Component $Component -Message $Message -Severity $Severity -IndentLevel $IndentLevel -StepName $StepName -ForegroundColor $ForegroundColor
+    $obj = Format-ConsoleMessage -Component $Component -Message $Message -Severity $Severity -IndentLevel $IndentLevel -Timestamp $Timestamp -StepName $StepName -ForegroundColor $ForegroundColor
     Write-Host $obj.Text -ForegroundColor $obj.ForegroundColor
 }
 

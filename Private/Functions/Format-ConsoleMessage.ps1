@@ -4,6 +4,7 @@ function Format-ConsoleMessage {
         [Parameter(Mandatory)] [string]$Message,
         [Parameter(Mandatory)] [ValidateSet('Info','Success','Warning','Error','Debug','Verbose')] [string]$Severity,
         [int]$IndentLevel = 0,
+        [AllowNull()][Nullable[datetime]]$Timestamp = $null,
         [string]$StepName = '',
         [string]$ForegroundColor
     )
@@ -22,7 +23,7 @@ function Format-ConsoleMessage {
         default   { if(-not $ForegroundColor){ $ForegroundColor = 'White' } }
     }
 
-    $now = (Get-Date -Format 'yyyy-MM-dd HH:mm:ss')
+    $now = (Resolve-LoggerTimestamp -Timestamp $Timestamp).ToString('yyyy-MM-dd HH:mm:ss')
     $prefix = "[$Severity]" + $parts.SeverityPad
     $text = "[$now] $prefix$($parts.Indent)$($parts.StepTag) $Message"
 

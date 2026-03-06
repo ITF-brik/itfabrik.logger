@@ -5,7 +5,8 @@ function Invoke-FileSink {
         [Parameter(Mandatory)][string]$Component,
         [Parameter(Mandatory)][string]$Message,
         [Parameter(Mandatory)][ValidateSet('Info','Success','Warning','Error','Debug','Verbose')][string]$Severity,
-        [int]$IndentLevel = 0
+        [int]$IndentLevel = 0,
+        [AllowNull()][Nullable[datetime]]$Timestamp = $null
     )
 
     $path = $Options.Path
@@ -19,11 +20,12 @@ function Invoke-FileSink {
     $maxRolls  = [int]  ($(if ($Options.ContainsKey('MaxRolls'))  { $Options.MaxRolls }  else { 3 }))
     $encoding  = $(if ($Options.ContainsKey('Encoding')) { $Options.Encoding } else { 'UTF8BOM' })
 
+    $effectiveTimestamp = Resolve-LoggerTimestamp -Timestamp $Timestamp
     $effectivePath = $path
     if ($rotation -match 'Daily') {
         $dir = Split-Path -Parent $path
         $leaf = Split-Path -Leaf $path
-        $date = Get-Date -Format 'yyyy-MM-dd'
+        $date = $effectiveTimestamp.ToString('yyyy-MM-dd')
         if ($leaf -match '\.log$') {
             $base = [System.IO.Path]::GetFileNameWithoutExtension($leaf)
             $ext  = [System.IO.Path]::GetExtension($leaf)
@@ -99,14 +101,12 @@ function Invoke-FileSink {
         }
     }
 
-    $now = Get-Date
-
     switch -Regex ($format) {
         '^cmtrace$' {
-            $line = Format-LoggerLineCmtrace -Severity $Severity -Component $Component -Message $Message -IndentLevel $IndentLevel
+            $line = Format-LoggerLineCmtrace -Severity $Severity -Component $Component -Message $Message -IndentLevel $IndentLevel -Timestamp $effectiveTimestamp
         }
         default {
-            $ts = $now.ToString('yyyy-MM-dd HH:mm:ss')
+            $ts = $effectiveTimestamp.ToString('yyyy-MM-dd HH:mm:ss')
             $line = Format-LoggerLineDefault -Timestamp $ts -Severity $Severity -Component $Component -Message $Message -IndentLevel $IndentLevel
         }
     }

@@ -4,6 +4,7 @@ function Format-LoggerLineCmtrace {
         [Parameter(Mandatory)][string]$Component,
         [Parameter(Mandatory)][string]$Message,
         [int]$IndentLevel = 0,
+        [AllowNull()][Nullable[datetime]]$Timestamp = $null,
         [bool]$IsLast = $false
     )
     # CMTrace XML-like format expected by cmtrace.exe
@@ -16,8 +17,9 @@ function Format-LoggerLineCmtrace {
         default   { '1' }
     }
 
-    $time    = Get-Date -Format 'HH:mm:ss.ffffff'
-    $date    = Get-Date -Format 'M-d-yyyy'
+    $effectiveTimestamp = Resolve-LoggerTimestamp -Timestamp $Timestamp
+    $time    = $effectiveTimestamp.ToString('HH:mm:ss.ffffff')
+    $date    = $effectiveTimestamp.ToString('M-d-yyyy')
     $context = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
     $thread  = [Threading.Thread]::CurrentThread.ManagedThreadId
 

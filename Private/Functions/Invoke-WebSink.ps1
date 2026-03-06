@@ -5,7 +5,8 @@ function Invoke-WebSink {
         [Parameter(Mandatory)][string]$Component,
         [Parameter(Mandatory)][string]$Message,
         [Parameter(Mandatory)][ValidateSet('Info','Success','Warning','Error','Debug','Verbose')][string]$Severity,
-        [int]$IndentLevel = 0
+        [int]$IndentLevel = 0,
+        [AllowNull()][Nullable[datetime]]$Timestamp = $null
     )
 
     $url = $Options.Url
@@ -17,8 +18,9 @@ function Invoke-WebSink {
     $headers = @{}
     if ($apiKey) { $headers['X-API-Key'] = $apiKey }
     if ($Options.Headers -is [hashtable]) { $Options.Headers.GetEnumerator() | ForEach-Object { $headers[$_.Key] = $_.Value } }
+    $effectiveTimestamp = Resolve-LoggerTimestamp -Timestamp $Timestamp
     $payload = [ordered]@{
-        timestamp  = (Get-Date).ToString('o')
+        timestamp  = $effectiveTimestamp.ToString('o')
         component  = $Component
         message    = $Message
         severity   = $Severity

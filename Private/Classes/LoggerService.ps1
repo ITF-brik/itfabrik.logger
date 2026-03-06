@@ -36,15 +36,16 @@ class LoggerService {
                 [Parameter(Mandatory)] [string]$Component,
                 [Parameter(Mandatory)] [string]$Message,
                 [Parameter(Mandatory)] [ValidateSet('Info','Success','Warning','Error','Debug','Verbose')] [string]$Severity,
-                [int]$IndentLevel = 0
+                [int]$IndentLevel = 0,
+                [AllowNull()][Nullable[datetime]]$Timestamp = $null
             )
             $svc = [LoggerService]::GetInstance()
             foreach ($sink in $svc.Sinks) {
                 switch ($sink.Type.ToLower()) {
-                    'console' { Invoke-SMConsoleLogger $Component $Message $Severity $IndentLevel }
-                    'file'    { Invoke-FileSink -Options $sink.Options -Component $Component -Message $Message -Severity $Severity -IndentLevel $IndentLevel }
-                    'web'     { Invoke-WebSink  -Options $sink.Options -Component $Component -Message $Message -Severity $Severity -IndentLevel $IndentLevel }
-                    'serilog' { Invoke-SerilogSink -Options $sink.Options -Component $Component -Message $Message -Severity $Severity -IndentLevel $IndentLevel }
+                    'console' { Invoke-SMConsoleLogger $Component $Message $Severity $IndentLevel -Timestamp $Timestamp }
+                    'file'    { Invoke-FileSink -Options $sink.Options -Component $Component -Message $Message -Severity $Severity -IndentLevel $IndentLevel -Timestamp $Timestamp }
+                    'web'     { Invoke-WebSink  -Options $sink.Options -Component $Component -Message $Message -Severity $Severity -IndentLevel $IndentLevel -Timestamp $Timestamp }
+                    'serilog' { Invoke-SerilogSink -Options $sink.Options -Component $Component -Message $Message -Severity $Severity -IndentLevel $IndentLevel -Timestamp $Timestamp }
                 }
             }
         }

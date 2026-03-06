@@ -5,7 +5,8 @@ function Invoke-SerilogSink {
         [Parameter(Mandatory)][string]$Component,
         [Parameter(Mandatory)][string]$Message,
         [Parameter(Mandatory)][ValidateSet('Info','Success','Warning','Error','Debug','Verbose')][string]$Severity,
-        [int]$IndentLevel = 0
+        [int]$IndentLevel = 0,
+        [AllowNull()][Nullable[datetime]]$Timestamp = $null
     )
 
     $url = $Options.Url
@@ -21,7 +22,7 @@ function Invoke-SerilogSink {
         $Options.Headers.GetEnumerator() | ForEach-Object { $headers[$_.Key] = $_.Value }
     }
 
-    $payload = Format-LoggerEventSerilog -Component $Component -Message $Message -Severity $Severity -IndentLevel $IndentLevel
+    $payload = Format-LoggerEventSerilog -Component $Component -Message $Message -Severity $Severity -IndentLevel $IndentLevel -Timestamp $Timestamp
 
     try {
         Invoke-RestMethod -Method Post -Uri $url -Headers $headers -Body ($payload | ConvertTo-Json -Depth 8) -ContentType 'application/json' -ErrorAction Stop | Out-Null

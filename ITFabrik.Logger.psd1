@@ -17,6 +17,7 @@
     PrivateData       = @{
         PSData = @{
             Tags = @('logging','ITFabrik.Stepper','stepper','console')
+            Prerelease = $null
         }
     }
 }

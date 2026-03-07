@@ -1,12 +1,19 @@
-# ITFabrik.Logger Documentation
+# ITFabrik.Logger - Documentation
 
-Bienvenue. Cette documentation décrit l'usage du module ITFabrik.Logger, ses sinks, formats et options.
+Cette documentation est organisee par intention.
 
-- Voir `docs/sinks/console.md` pour la console.
-- Voir `docs/sinks/file.md` pour la sortie fichier (rotations, encodages).
-- Voir `docs/sinks/web.md` pour l'envoi HTTP JSON.
-- Voir `docs/sinks/serilog.md` pour le sink HTTP JSON structure Serilog-like.
-- Voir `docs/formats/default.md` et `docs/formats/cmtrace.md` pour les formats.
-- Voir `docs/rotation.md` pour les stratégies de rotation.
-- Voir `docs/configuration.md` pour l'initialisation et l'enregistrement des sinks.
-- Voir `docs/troubleshooting.md` pour les problèmes courants (accents, CMTrace).
+## Utiliser le module
+- `docs/configuration.md` : initialisation, enregistrement des sinks et points d'extension.
+- `docs/sinks/console.md` : rendu console et formatage des messages.
+- `docs/sinks/file.md` : sortie fichier, rotations et encodages.
+- `docs/sinks/web.md` : envoi HTTP JSON.
+- `docs/sinks/serilog.md` : sink HTTP JSON structure Serilog-like.
+- `docs/formats/default.md` : format de ligne standard.
+- `docs/formats/cmtrace.md` : format compatible CMTrace.
+- `docs/rotation.md` : strategies de rotation.
+- `docs/troubleshooting.md` : diagnostic et depannage.
+
+## Maintenir le projet
+- `docs/development-cycle.md` : document principal pour le flux recurrent de developpement, release et cloture de branche.
+- `docs/release-procedure.md` : checklist courte pour publier une version quand un cycle est pret.
+- `docs/github-setup.md` : mise en place initiale du depot GitHub, des secrets et des workflows.

@@ -5,6 +5,11 @@ The format is based on Keep a Changelog, and this project adheres to SemVer.
 
 ## [Unreleased]
 
+## [0.3.4] - 2026-03-07
+
+### Fixed
+- Assertions de timestamp des tests `WebSink` et `SerilogSink` alignees sur le JSON reellement emis, ce qui retablit les workflows `CI - Tests` et `CI - Coverage`.
+
 ## [0.3.3] - 2026-03-07
 
 ### Added
@@ -92,7 +97,8 @@ The format is based on Keep a Changelog, and this project adheres to SemVer.
 
 ---
 
-[Unreleased]: https://github.com/ITF-brik/itfabrik.logger/compare/v0.3.3...HEAD
+[Unreleased]: https://github.com/ITF-brik/itfabrik.logger/compare/v0.3.4...HEAD
+[0.3.4]: https://github.com/ITF-brik/itfabrik.logger/releases/tag/v0.3.4
 [0.3.3]: https://github.com/ITF-brik/itfabrik.logger/releases/tag/v0.3.3
 [0.3.2]: https://github.com/ITF-brik/itfabrik.logger/releases/tag/v0.3.2
 [0.3.1]: https://github.com/ITF-brik/itfabrik.logger/releases/tag/v0.3.1

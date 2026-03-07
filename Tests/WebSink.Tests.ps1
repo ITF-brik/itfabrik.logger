@@ -36,8 +36,7 @@ Describe 'Web Sink (Invoke-WebSink)' {
             Invoke-WebSink -Options @{ Url = $script:targetUrl } -Component 'Unit' -Message 'Hi' -Severity 'Info' -IndentLevel 1 -Timestamp ([datetime]'2025-01-01 12:34:56')
 
             Should -Invoke -CommandName Invoke-RestMethod -Times 1 -Exactly
-            $payload = $script:capturedBody | ConvertFrom-Json -Depth 10
-            $payload.timestamp | Should -Be '2025-01-01T12:34:56.0000000'
+            $script:capturedBody | Should -Match '"timestamp"\s*:\s*"2025-01-01T12:34:56\.0000000"'
         }
     }
 }

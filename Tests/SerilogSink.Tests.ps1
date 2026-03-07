@@ -62,8 +62,7 @@ Describe 'Serilog Sink (Invoke-SerilogSink)' {
             Invoke-SerilogSink -Options @{ Url = $script:targetUrl } -Component 'Unit.Component' -Message 'Processed item' -Severity 'Info' -IndentLevel 2 -Timestamp ([datetime]'2025-01-01 12:34:56')
 
             Should -Invoke -CommandName Invoke-RestMethod -Times 1 -Exactly
-            $payload = $script:capturedCall.Body | ConvertFrom-Json -Depth 10
-            $payload.Timestamp | Should -Be '2025-01-01T12:34:56.0000000'
+            $script:capturedCall.Body | Should -Match '"Timestamp"\s*:\s*"2025-01-01T12:34:56\.0000000"'
         }
     }
 

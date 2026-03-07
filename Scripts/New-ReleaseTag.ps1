@@ -1,21 +1,12 @@
-<#!
+<#
 .SYNOPSIS
-  Crée un tag Git vX.Y.Z à partir de la ModuleVersion du manifeste.
+  Creates a Git tag from the effective module release version.
 
 .DESCRIPTION
-  Lit `ITFabrik.Logger.psd1`, récupère `ModuleVersion`, vérifie le format SemVer
-  basique, vérifie l'absence d'un tag existant du même nom, puis crée un tag
-  annoté `vX.Y.Z`. Avec `-Push`, pousse le tag vers `origin`.
-
-.PARAMETER Push
-  Si présent, exécute `git push origin vX.Y.Z` après création du tag.
-
-.EXAMPLE
-  ./Scripts/New-ReleaseTag.ps1 -Push
-  # Crée et pousse le tag correspondant à ModuleVersion.
-
-.NOTES
-  Nécessite Git installé et accessible dans le PATH.
+  Reads `ITFabrik.Logger.psd1`, resolves the effective release version from
+  `ModuleVersion` and optional `PrivateData.PSData.Prerelease`, ensures the tag
+  does not already exist, then creates an annotated tag such as `v0.3.2` or
+  `v0.3.3-alpha1`. With `-Push`, the tag is pushed to `origin`.
 #>
 param(
     [switch]$Push
@@ -27,57 +18,42 @@ $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $manifestPath = Join-Path $repoRoot 'ITFabrik.Logger.psd1'
 if (-not (Test-Path -LiteralPath $manifestPath)) {
-    throw "Manifest introuvable: $manifestPath"
+    throw "Manifest not found: $manifestPath"
 }
 
-$manifest = Import-PowerShellDataFile -LiteralPath $manifestPath
-$version  = [string]$manifest.ModuleVersion
-if ([string]::IsNullOrWhiteSpace($version)) {
-    throw 'ModuleVersion manquante dans le manifeste.'
-}
+. (Join-Path $PSScriptRoot 'ModuleVersion.ps1')
 
-# Validation SemVer simple: X.Y.Z (optionnels pré-release/build non gérés ici)
-if ($version -notmatch '^[0-9]+\.[0-9]+\.[0-9]+$') {
-    throw "ModuleVersion '$version' n'est pas au format X.Y.Z"
-}
+$releaseInfo = Get-LoggerReleaseVersionInfo -ManifestPath $manifestPath
+$tag = $releaseInfo.TagName
+Write-Host "Manifest version: $($releaseInfo.EffectiveVersion) -> Tag: $tag" -ForegroundColor Cyan
 
-$tag = "v$version"
-Write-Host "Version du manifeste: $version -> Tag: $tag" -ForegroundColor Cyan
-
-# Vérifie que Git est disponible
 if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
-    throw 'Git introuvable dans le PATH.'
+    throw 'Git not found in PATH.'
 }
 
-# S'assure que l'on se trouve à la racine du dépôt
 Push-Location $repoRoot
 try {
-    # Vérifie que le repo est Git
     git rev-parse --git-dir *> $null 2>&1
 } catch {
     Pop-Location
-    throw "Le dossier '$repoRoot' n'est pas un dépôt Git."
+    throw "The folder '$repoRoot' is not a Git repository."
 }
 
 try {
-    # Vérifie si le tag existe déjà
     $existing = git tag -l $tag
     if ($existing) {
-        throw "Le tag '$tag' existe déjà. Rien à faire."
+        throw "Tag '$tag' already exists."
     }
 
-    # Crée un tag annoté
     git tag -a $tag -m "Release $tag"
-    Write-Host "Tag créé localement: $tag" -ForegroundColor Green
+    Write-Host "Tag created locally: $tag" -ForegroundColor Green
 
     if ($Push) {
-        # Détermine le remote par défaut (origin)
         $remote = (git remote 2>$null) | Where-Object { $_ -eq 'origin' } | Select-Object -First 1
         if (-not $remote) { $remote = 'origin' }
         git push $remote $tag
-        Write-Host "Tag poussé vers '$remote': $tag" -ForegroundColor Green
+        Write-Host "Tag pushed to '$remote': $tag" -ForegroundColor Green
     }
 } finally {
     Pop-Location
 }
-

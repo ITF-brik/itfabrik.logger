@@ -5,6 +5,14 @@ The format is based on Keep a Changelog, and this project adheres to SemVer.
 
 ## [Unreleased]
 
+### Added
+- Documentation et automatisation d'un cycle de developpement base sur des branches `cycle/*`.
+- Scripts `New-DevelopmentCycle.ps1`, `Close-DevelopmentCycle.ps1` et `ModuleVersion.ps1`.
+
+### Changed
+- Workflows CI, coverage, verification de tag et publication alignes sur le flux `cycle/*`.
+- Procedure de release mise a jour pour prendre en charge les prereleases via `PrivateData.PSData.Prerelease`.
+
 ## [0.3.2] - 2026-03-06
 ### Changed
 - Le dispatcher global `StepManagerLogger` accepte désormais un 5e argument optionnel `Timestamp`.

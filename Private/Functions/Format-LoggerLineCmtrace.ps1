@@ -25,10 +25,10 @@ function Format-LoggerLineCmtrace {
 
     $prefix = ''
     if ($IndentLevel -gt 1) {
-        for ($i = 1; $i -lt $IndentLevel; $i++) { $prefix += '│  ' }
+        for ($i = 1; $i -lt $IndentLevel; $i++) { $prefix += '|  ' }
     }
     if ($IndentLevel -gt 0) {
-        $branchGlyph = if ($IsLast) { '└─ ' } else { '├─ ' }
+        $branchGlyph = if ($IsLast) { '\- ' } else { '+- ' }
         $prefix += $branchGlyph
     }
     $msgWithIndent = "$prefix$Message"

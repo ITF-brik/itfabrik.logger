@@ -29,6 +29,17 @@ function Add-FileSection {
     [void]$Builder.AppendLine()
 }
 
+function Write-TextFileUtf8Bom {
+    param(
+        [Parameter(Mandatory)][string]$Path,
+        [Parameter(Mandatory)][string]$Content
+    )
+
+    # Emit an explicit BOM so Windows PowerShell 5.1 preserves non-ASCII characters.
+    $encoding = New-Object System.Text.UTF8Encoding -ArgumentList $true
+    [System.IO.File]::WriteAllText($Path, $Content, $encoding)
+}
+
 $moduleRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
 $sourcePsd1 = Join-Path $moduleRoot 'ITFabrik.Logger.psd1'
 $sourcePsm1 = Join-Path $moduleRoot 'ITFabrik.Logger.psm1'
@@ -68,7 +79,7 @@ foreach ($file in $publicFunctions) { Add-FileSection -Builder $builder -File $f
 [void]$builder.AppendLine('# Exports')
 foreach ($line in $exportLines) { [void]$builder.AppendLine($line.TrimEnd()) }
 
-Set-Content -LiteralPath $distPsm1 -Value $builder.ToString().TrimEnd() -Encoding UTF8
+Write-TextFileUtf8Bom -Path $distPsm1 -Content $builder.ToString().TrimEnd()
 Copy-Item -LiteralPath $sourcePsd1 -Destination (Join-Path $OutputRoot 'ITFabrik.Logger.psd1') -Force
 Copy-Item -LiteralPath $sourceReadme -Destination (Join-Path $OutputRoot 'README.md') -Force
 Copy-Item -LiteralPath $sourceLicense -Destination (Join-Path $OutputRoot 'LICENSE') -Force

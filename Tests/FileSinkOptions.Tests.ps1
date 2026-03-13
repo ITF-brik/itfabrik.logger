@@ -16,6 +16,13 @@ Describe 'File Sink (formats, rotation, encodings)' {
         }
     }
 
+    It 'uses ASCII tree prefixes for CMTrace indentation' {
+        InModuleScope 'ITFabrik.Logger' {
+            $line = Format-LoggerLineCmtrace -Severity 'Info' -Component 'Comp' -Message 'Msg' -IndentLevel 2 -IsLast $true
+            $line | Should -Match ([regex]::Escape('<![LOG[|  \- Msg]LOG]!><time="'))
+        }
+    }
+
     It 'applies Daily rotation naming with .log extension' {
         InModuleScope 'ITFabrik.Logger' {
             $base = Join-Path $env:TEMP ("daily_{0}.log" -f ([guid]::NewGuid().ToString('N')))
@@ -40,4 +47,3 @@ Describe 'File Sink (formats, rotation, encodings)' {
         }
     }
 }
-

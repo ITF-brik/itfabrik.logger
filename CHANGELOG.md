@@ -5,6 +5,12 @@ The format is based on Keep a Changelog, and this project adheres to SemVer.
 
 ## [Unreleased]
 
+## [0.3.5] - 2026-03-13
+
+### Fixed
+- L'artefact `dist/ITFabrik.Logger/ITFabrik.Logger.psm1` est maintenant genere avec un BOM UTF-8 explicite pour preserver correctement les caracteres non ASCII sous Windows PowerShell 5.1.
+- Les prefixes d'indentation CMTrace utilisent des caracteres ASCII (`|`, `+-`, `\-`) afin d'eviter les problemes d'interpretation de glyphes.
+
 ## [0.3.4] - 2026-03-07
 
 ### Fixed
@@ -97,7 +103,8 @@ The format is based on Keep a Changelog, and this project adheres to SemVer.
 
 ---
 
-[Unreleased]: https://github.com/ITF-brik/itfabrik.logger/compare/v0.3.4...HEAD
+[Unreleased]: https://github.com/ITF-brik/itfabrik.logger/compare/v0.3.5...HEAD
+[0.3.5]: https://github.com/ITF-brik/itfabrik.logger/releases/tag/v0.3.5
 [0.3.4]: https://github.com/ITF-brik/itfabrik.logger/releases/tag/v0.3.4
 [0.3.3]: https://github.com/ITF-brik/itfabrik.logger/releases/tag/v0.3.3
 [0.3.2]: https://github.com/ITF-brik/itfabrik.logger/releases/tag/v0.3.2
